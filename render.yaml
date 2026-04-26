@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: thsport-backend
+    runtime: node
+    rootDir: Backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: thsport-db
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        value: https://thsport-frontend.onrender.com,https://thsports-frontend.onrender.com,http://localhost:5173,http://localhost:5174
+
+  - type: web
+    name: thsport-frontend
+    runtime: node
+    rootDir: Frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: VITE_API_URL
+        value: https://thsport-backend.onrender.com/api
+      - key: NODE_ENV
+        value: production

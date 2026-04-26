@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: thsport-frontend
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: VITE_API_URL
+        value: https://thsport-backend.onrender.com/api
+      - key: NODE_ENV
+        value: production
