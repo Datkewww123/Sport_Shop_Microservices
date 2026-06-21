@@ -6,9 +6,9 @@ import { useAuth } from "../context/AuthContext";
 export default function AdminRoute({ element }) {
   const { currentUser } = useAuth();
 
-  // 1. Nếu chưa đăng nhập, chuyển đến trang đăng nhập
+  // 1. Nếu chưa đăng nhập, chuyển đến trang chủ
   if (!currentUser) {
-    return <Navigate to="/dang-nhap" replace />;
+    return <Navigate to="/" replace />;
   }
 
   // 2. Nếu đã đăng nhập nhưng không phải admin, chuyển đến trang chủ

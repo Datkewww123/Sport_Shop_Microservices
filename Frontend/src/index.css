@@ -355,7 +355,7 @@ html.dark .text-gray-500 {
   align-items: center !important;
   gap: 12px !important;
   border: 1px solid rgba(0, 0, 0, 0.05) !important;
-  transition: all 0.3s ease !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
 .Toastify__toast-body {
@@ -424,7 +424,28 @@ html.dark .Toastify__toast--warning {
 }
 
 .Toastify__progress-bar {
-  display: none !important;
+  display: block !important;
+  height: 3px !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  border-radius: 0 0 16px 16px !important;
+  transform-origin: left !important;
+}
+
+.Toastify__progress-bar--success {
+  background: #22c55e !important;
+}
+
+.Toastify__progress-bar--error {
+  background: #ef4444 !important;
+}
+
+.Toastify__progress-bar--info {
+  background: #3b82f6 !important;
+}
+
+.Toastify__progress-bar--warning {
+  background: #f59e0b !important;
 }
 
 /* --- SOFT PREMIUM CORNERS FOR SQUARE/RECTANGULAR ELEMENTS --- */

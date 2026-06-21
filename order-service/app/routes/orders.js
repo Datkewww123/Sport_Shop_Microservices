@@ -127,28 +127,7 @@ router.post("/", auth, orderController.createOrder);
  */
 router.get("/", auth, orderController.getOrders);
 
-/**
- * @swagger
- * /orders/lookup:
- *   get:
- *     summary: Tra cứu đơn hàng công khai (không cần đăng nhập)
- *     tags: [Orders]
- *     parameters:
- *       - in: query
- *         name: orderId
- *         schema:
- *           type: string
- *       - in: query
- *         name: phone
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Tìm thấy đơn hàng
- *       404:
- *         description: Không tìm thấy đơn hàng
- */
-router.get('/lookup', orderController.lookupOrder);
+
 
 /**
  * @swagger
@@ -264,27 +243,11 @@ router.put("/:id", auth, admin, orderController.updateOrder);
  */
 router.delete("/:id", auth, orderController.deleteOrder);
 
+// Xác nhận đã nhận hàng (User)
+router.post("/:id/receive", auth, orderController.receiveOrder);
+
 // Internal: Cập nhật trạng thái thanh toán (từ payment-service)
 router.patch("/:id/payment-status", internalAuth, orderController.updatePaymentStatus);
 
 module.exports = router;
-/**
- * @swagger
- * /orders/lookup/{orderId}:
- * get:
- * summary: Tra cứu đơn hàng công khai theo ID
- * tags: [Orders]
- * parameters:
- * - in: path
- * name: orderId
- * required: true
- * schema:
- * type: string
- * description: ID của đơn hàng
- * responses:
- * 200:
- * description: Tra cứu thành công
- * 404:
- * description: Không tìm thấy đơn hàng
- */
-router.get("/lookup/:orderId", orderController.lookupOrder); // <-- ROUTE MỚI (KHÔNG CẦN AUTH)
+

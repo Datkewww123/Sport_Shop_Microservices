@@ -10,12 +10,14 @@ import CheckoutPage from "./pages/CheckoutPage";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
-import OrderLookupPage from "./pages/OrderLookupPage";
+import MockPaymentPage from "./pages/MockPaymentPage";
+
 import PaymentReturnPage from "./pages/PaymentReturnPage";
 import AccountPage from "./pages/AccountPage";
 import SearchPage from "./pages/SearchPage";
 import BrandProductsPage from "./pages/BrandProductsPage";
-import { ToastContainer, toast } from "react-toastify";
+import OrderHistoryPage from "./pages/OrderHistoryPage";
+import { ToastContainer, toast, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import RepairService from "./pages/policies/RepairService";
 import SizeGuidePage from "./pages/policies/SizeGuidePage";
@@ -84,13 +86,14 @@ function App() {
       <ToastContainer
         position="top-center"
         autoClose={3000}
-        hideProgressBar={true}
+        transition={Slide}
+        hideProgressBar={false}
         newestOnTop={true}
         closeOnClick
         rtl={false}
         pauseOnFocusLoss={false}
         draggable
-        pauseOnHover
+        pauseOnHover={false}
         theme="light"
       />
       <Header />
@@ -113,10 +116,11 @@ function App() {
           <Route path="/dang-ky" element={<RegisterPage />} />
           <Route path="/dang-nhap" element={<LoginPage />} />
 
-          <Route path="/tra-cuu-don-hang" element={<OrderLookupPage />} />
           <Route path="/tai-khoan" element={<AccountPage />} />
+          <Route path="/don-hang" element={<OrderHistoryPage />} />
           <Route path="/tim-kiem" element={<SearchPage />} />
           <Route path="/payment/return" element={<PaymentReturnPage />} />
+          <Route path="/payment/mock" element={<MockPaymentPage />} />
           <Route path="/hang/:brandSlug" element={<BrandProductsPage />} />
 
           <Route path="/dich-vu/sua-chua-giay" element={<RepairService />} />

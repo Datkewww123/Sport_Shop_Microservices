@@ -1,5 +1,6 @@
 const httpStatus = require("../constants/httpStatus");
 const Order = require("../models/Order");
+const Promotion = require("../models/Promotion");
 const responseHelper = require("../helpers/response.helper");
 
 const axios = require('axios'); // npm install axios
@@ -16,6 +17,7 @@ exports.createOrder = async (req, res) => {
       shippingAddress,
       paymentMethod = "cod",
       customerNote,
+      couponCode,
       discount = 0,
       shippingFee = 0,
     } = req.body;
@@ -43,7 +45,38 @@ exports.createOrder = async (req, res) => {
       (sum, item) => sum + item.price * item.quantity,
       0
     );
-    const total = subtotal + shippingFee - discount;
+
+    // Auto-apply coupon if provided
+    let appliedDiscount = Number(discount) || 0;
+    let appliedCouponCode = null;
+    if (couponCode) {
+      const promotion = await Promotion.findOne({ code: couponCode.toUpperCase(), active: true });
+      if (!promotion) {
+        return res.status(400).json({ error: 'Mã giảm giá không tồn tại' });
+      }
+      const now = new Date();
+      if (promotion.startDate && now < promotion.startDate) {
+        return res.status(400).json({ error: 'Mã giảm giá chưa đến hạn sử dụng' });
+      }
+      if (promotion.endDate && now > promotion.endDate) {
+        return res.status(400).json({ error: 'Mã giảm giá đã hết hạn' });
+      }
+      if (promotion.maxUses && promotion.currentUses >= promotion.maxUses) {
+        return res.status(400).json({ error: 'Mã giảm giá đã hết lượt sử dụng' });
+      }
+
+      if (promotion.discountType === 'percentage') {
+        appliedDiscount = Math.round(subtotal * promotion.discount / 100);
+      } else {
+        appliedDiscount = promotion.discount;
+      }
+      appliedCouponCode = promotion.code;
+
+      promotion.currentUses += 1;
+      await promotion.save();
+    }
+
+    const total = subtotal + shippingFee - appliedDiscount;
 
     if (total < 0) {
       return res.status(400).json({ error: "Tổng tiền không hợp lệ" });
@@ -68,7 +101,8 @@ exports.createOrder = async (req, res) => {
       items,
       subtotal,
       shippingFee,
-      discount,
+      discount: appliedDiscount,
+      couponCode: appliedCouponCode,
       total,
       paymentMethod,
       shippingAddress,
@@ -96,22 +130,23 @@ exports.createOrder = async (req, res) => {
     let paymentUrl = null;
     if (paymentMethod === "momo") {
       try {
-        const momoRes = await axios.post(
+        const payRes = await axios.post(
           `${PAYMENT_SERVICE_URL}/api/payment/create`,
           {
             orderId: order._id.toString(),
             amount: total,
             orderInfo: `Thanh toan don hang ${order.orderCode}`,
+            paymentMethod,
           },
           { headers: { 'x-internal-key': process.env.INTERNAL_API_KEY } }
         );
 
-        if (momoRes.data.success) {
-          paymentUrl = momoRes.data.data.payUrl;
+        if (payRes.data.success) {
+          paymentUrl = payRes.data.data.payUrl;
           order.paymentUrl = paymentUrl;
         }
-      } catch (momoErr) {
-        console.error('MoMo payment creation failed:', momoErr.message);
+      } catch (payErr) {
+        console.error(`${paymentMethod.toUpperCase()} payment creation failed:`, payErr.message);
       }
     }
 
@@ -420,124 +455,7 @@ exports.updatePaymentStatus = async (req, res) => {
   }
 };
 
-// Public lookup - tra cứu đơn hàng bằng orderCode và phone
-exports.lookupOrder = async (req, res) => {
-  try {
-    // Hỗ trợ cả query params và route params
-    const orderId = req.query.orderId || req.params.orderId || '';
-    const phone = req.query.phone || '';
 
-    console.log("=== LOOKUP REQUEST ===");
-    console.log("orderId:", orderId);
-    console.log("phone:", phone);
-
-    if (!orderId && !phone) {
-      return responseHelper.error(res, httpStatus.BAD_REQUEST, {
-        error: "Vui lòng cung cấp mã đơn hàng hoặc số điện thoại"
-      });
-    }
-
-    let order;
-
-    // Tìm theo orderCode (ưu tiên)
-    if (orderId) {
-      const lookupKey = orderId.replace(/^#/, '').trim();
-      console.log("Looking up with key:", lookupKey);
-      
-      // Tìm theo orderCode trước
-      order = await Order.findOne({ 
-        orderCode: { $regex: lookupKey, $options: 'i' }
-      });
-      console.log("Found by orderCode:", order ? order.orderCode : "NOT FOUND");
-
-      // Nếu không tìm thấy, thử tìm theo _id
-      if (!order) {
-        const isObjectId = /^[0-9A-F]{24}$/i.test(lookupKey);
-        if (isObjectId) {
-          order = await Order.findById(lookupKey);
-          console.log("Found by _id:", order ? "YES" : "NO");
-        } else if (lookupKey.length === 6) {
-          // Tìm theo 6 ký tự cuối của _id
-          const orders = await Order.aggregate([
-            {
-              $match: {
-                $expr: {
-                  $eq: [
-                    {
-                      $substrCP: [
-                        { $toUpper: { $toString: "$_id" } },
-                        { $subtract: [{ $strLenCP: { $toString: "$_id" } }, 6] },
-                        6,
-                      ],
-                    },
-                    lookupKey.toUpperCase(),
-                  ],
-                },
-              },
-            },
-            { $sort: { createdAt: -1 } },
-            { $limit: 1 },
-          ]);
-          order = orders[0];
-          console.log("Found by 6-char _id:", order ? "YES" : "NO");
-        }
-      }
-    }
-
-    // Nếu có phone, filter thêm hoặc tìm theo phone
-    if (phone) {
-      const phoneRegex = new RegExp(phone.replace(/\s+/g, ''), 'i');
-      
-      if (order) {
-        // Đã có order từ orderId, kiểm tra phone có khớp không
-        const orderPhone = order.shippingAddress?.phone || '';
-        if (!phoneRegex.test(orderPhone.replace(/\s+/g, ''))) {
-          order = null; // Phone không khớp
-        }
-      } else {
-        // Chưa có order, tìm theo phone
-        order = await Order.findOne({
-          'shippingAddress.phone': phoneRegex
-        }).sort('-createdAt');
-      }
-    }
-
-    if (!order) {
-      return responseHelper.error(res, httpStatus.NOT_FOUND, {
-        error: "Không tìm thấy đơn hàng. Vui lòng kiểm tra lại mã đơn hàng hoặc số điện thoại.",
-      });
-    }
-
-    // Map dữ liệu
-    const orderToMap = order.toObject ? order.toObject() : order;
-
-    const lookupData = {
-      _id: orderToMap._id,
-      orderCode: orderToMap.orderCode,
-      createdAt: orderToMap.createdAt,
-      status: orderToMap.status,
-      total: orderToMap.total,
-      paymentMethod: orderToMap.paymentMethod,
-      shippingAddress: orderToMap.shippingAddress,
-      customer: orderToMap.shippingAddress?.fullName || 'Khách hàng',
-      items: orderToMap.items.map((item) => ({
-        name: item.name,
-        quantity: item.quantity,
-        image: item.image,
-        price: item.price,
-        selectedSize: item.selectedSize,
-      })),
-    };
-
-    console.log("Returning lookup data:", lookupData);
-    return responseHelper.success(res, lookupData, 'Tra cứu thành công', httpStatus.OK);
-  } catch (err) {
-    console.error("Lỗi tra cứu:", err);
-    return responseHelper.error(res, httpStatus.BAD_REQUEST, {
-      error: err.message || "Lỗi không xác định khi tra cứu đơn hàng.",
-    });
-  }
-};
 
 // --- ADMIN CONTROLLERS ---
 
@@ -815,5 +733,47 @@ exports.getOrderStatsSummary = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+exports.receiveOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ error: "Không tìm thấy đơn hàng" });
+    }
+
+    if (order.user.toString() !== req.user.id) {
+      return res.status(403).json({ error: "Bạn không có quyền xác nhận đơn hàng này" });
+    }
+
+    if (order.status !== "shipping") {
+      return res.status(400).json({ error: "Chỉ có thể xác nhận đã nhận hàng khi đơn hàng đang được giao" });
+    }
+
+    order.status = "delivered";
+    order.deliveredAt = new Date();
+    order.paymentStatus = "paid";
+
+    for (const item of order.items) {
+      try {
+        await axios.post(
+          `${CATALOG_SERVICE_URL}/api/products/${item.productId}/increment-sold`,
+          { quantity: item.quantity },
+          { headers: { 'x-internal-key': process.env.INTERNAL_API_KEY } }
+        );
+      } catch (catErr) {
+        console.error(`Failed to increment sold count for ${item.productId}:`, catErr.message);
+      }
+    }
+
+    await order.save();
+
+    setImmediate(() => eventBus.publishOrderDelivered(order));
+
+    res.json({ success: true, data: order });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 };

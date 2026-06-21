@@ -6,7 +6,7 @@ import { fetchApi } from "../utils/api";
 import SearchAutocomplete from "./SearchAutocomplete";
 
 export default function Header() {
-  const { cartCount } = useCart();
+  const { cartCount, resetCart } = useCart();
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -77,10 +77,10 @@ export default function Header() {
   const toggleDark = () => setIsDark(prev => !prev);
 
   return (
-    <header>
+    <header className="sticky top-0 z-[1000]">
 
       {/* ===== MAIN HEADER ===== */}
-      <div className="bg-gray-50 dark:bg-slate-900 border-b border-gray-200/80 dark:border-slate-800/80 py-4 text-gray-800 dark:text-white transition-all duration-300 shadow-sm sticky top-0 z-[1000]">
+      <div className="bg-gray-50 dark:bg-slate-900 border-b border-gray-200/80 dark:border-slate-800/80 py-4 text-gray-800 dark:text-white transition-all duration-300 shadow-sm">
         <div className="w-[90%] max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-3">
             <button
@@ -144,6 +144,16 @@ export default function Header() {
                         </li>
                         <li>
                           <Link
+                            to="/don-hang"
+                            onClick={() => setUserDropdownOpen(false)}
+                            className="block py-3 px-4 text-gray-700 dark:text-slate-200 text-sm border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                          >
+                            <i className="fas fa-box mr-2" />
+                            Lịch sử đơn hàng
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
                             to="/gio-hang"
                             onClick={() => setUserDropdownOpen(false)}
                             className="block py-3 px-4 text-gray-700 dark:text-slate-200 text-sm border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
@@ -165,7 +175,9 @@ export default function Header() {
                           <button
                             onClick={() => {
                               setUserDropdownOpen(false);
+                              resetCart();
                               logout();
+                              navigate('/');
                             }}
                             className="w-full text-left py-3 px-4 text-red-600 dark:text-red-400 text-sm hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors font-medium cursor-pointer"
                           >
@@ -214,25 +226,6 @@ export default function Header() {
                             Đăng nhập
                           </Link>
                         </li>
-                        <li>
-                          <Link
-                            to="/gio-hang"
-                            onClick={() => setUserDropdownOpen(false)}
-                            className="block py-3 px-4 text-gray-700 dark:text-slate-200 text-sm border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-                          >
-                            Giỏ hàng
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/thanh-toan"
-                            onClick={() => setUserDropdownOpen(false)}
-                            className="block py-3 px-4 text-gray-700 dark:text-slate-200 text-sm border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-                          >
-                            Thanh toán
-                          </Link>
-                        </li>
-
                       </ul>
                     </div>
                   </div>
