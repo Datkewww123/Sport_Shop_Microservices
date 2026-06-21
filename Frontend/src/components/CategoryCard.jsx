@@ -16,15 +16,15 @@ export default function CategoryCard({
     return (
       <Link
         to={linkUrl}
-        className={`${baseClasses} ${gridClass} text-center bg-white pb-4`}
+        className={`${baseClasses} ${gridClass} text-center bg-white dark:bg-gray-800 pb-4`}
       >
         <img
           src={imageUrl}
           alt={title}
           className="w-full h-auto aspect-square object-cover"
         />
-        <h3 className="text-base font-bold mx-2.5 my-2.5">{title}</h3>
-        <p className="text-sm text-gray-600 px-2.5">{description}</p>
+        <h3 className="text-base font-bold mx-2.5 my-2.5 dark:text-white">{title}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300 px-2.5">{description}</p>
       </Link>
     );
   }
