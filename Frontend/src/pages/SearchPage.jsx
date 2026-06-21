@@ -1,11 +1,12 @@
 // src/pages/SearchPage.jsx (Đã sửa đổi)
 import React, { useMemo, useState, useEffect, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 // import { allProductsData } from "../data/products.js"; // XÓA: Lỗi xảy ra ở đây
 import ProductCard from "../components/ProductCard.jsx";
 import Pagination from "../components/Pagination.jsx";
 import { fetchApi, buildQueryParams } from "../utils/api"; // THÊM: Import fetchApi và buildQueryParams
 import { toast } from "react-toastify"; // THÊM: Để hiển thị lỗi
+import { SkeletonCard } from "../components/LoadingSkeleton";
 
 const PRODUCTS_PER_PAGE = 12; // Dùng 12 để đồng bộ với Backend
 
@@ -56,7 +57,7 @@ export default function SearchPage() {
         imageUrl:
           p.images?.length > 0
             ? p.images[0]
-            : "https://via.placeholder.com/300",
+            : "https://placehold.co/300x300?text=No+Image",
       }));
 
       setSearchResults({
@@ -86,7 +87,16 @@ export default function SearchPage() {
 
   if (loading) {
     return (
-      <div className="text-center py-20 text-xl">Đang tìm kiếm sản phẩm...</div>
+      <div className="container w-[90%] max-w-[1200px] mx-auto mt-10 py-10">
+        <h1 className="text-3xl font-bold text-center mb-4">
+          Đang tìm kiếm: "{query}"
+        </h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      </div>
     );
   }
 
@@ -116,11 +126,38 @@ export default function SearchPage() {
           />
         </>
       ) : (
-        <p className="text-center text-xl">
-          {!query
-            ? "Vui lòng nhập từ khóa để tìm kiếm."
-            : "Không tìm thấy sản phẩm nào phù hợp."}
-        </p>
+        <div className="text-center py-16">
+          <i className="fas fa-search text-6xl text-gray-300 mb-6" />
+          <h2 className="text-2xl font-bold text-gray-700 mb-3">
+            {!query
+              ? "Vui lòng nhập từ khóa tìm kiếm"
+              : `Không tìm thấy kết quả cho "${query}"`}
+          </h2>
+          <p className="text-gray-500 mb-8 max-w-md mx-auto">
+            {!query
+              ? "Nhập từ khóa vào ô tìm kiếm phía trên để bắt đầu."
+              : "Thử tìm kiếm với từ khóa khác hoặc khám phá sản phẩm của chúng tôi"}
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <Link
+              to="/san-pham"
+              className="bg-primary text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 transition-all duration-300"
+            >
+              Xem tất cả sản phẩm
+            </Link>
+            <Link
+              to="/"
+              className="border-2 border-primary text-primary font-bold py-3 px-6 rounded-lg hover:bg-primary hover:text-white transition-all duration-300"
+            >
+              Về trang chủ
+            </Link>
+          </div>
+          {query && (
+            <p className="text-sm text-gray-400 mt-8">
+              Gợi ý: Nike, Adidas, Puma, Futsal, Cỏ nhân tạo
+            </p>
+          )}
+        </div>
       )}
     </div>
   );
