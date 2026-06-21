@@ -15,9 +15,12 @@ export default function ProductGallery({ images }) {
       {/* 1. Ảnh chính */}
       <div className="w-full aspect-square border border-gray-200 rounded-lg overflow-hidden">
         <img
-          src={activeImage}
+          src={activeImage || "https://placehold.co/400x400?text=No+Image"}
           alt="Ảnh sản phẩm chính"
           className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = "https://placehold.co/400x400?text=No+Image";
+          }}
         />
       </div>
 
@@ -34,9 +37,12 @@ export default function ProductGallery({ images }) {
             }`}
           >
             <img
-              src={imgUrl}
+              src={imgUrl || "https://placehold.co/100x100?text=No+Image"}
               alt={`Ảnh thumbnail ${index + 1}`}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.src = "https://placehold.co/100x100?text=No+Image";
+              }}
             />
           </button>
         ))}
