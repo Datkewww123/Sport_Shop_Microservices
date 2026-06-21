@@ -1,0 +1,37 @@
+# Environment files
+.env
+.env.example
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+Frontend/node_modules/
+catalog-service/node_modules/
+identity-service/node_modules/
+order-service/node_modules/
+payment-service/node_modules/
+notification-service/node_modules/
+
+# Build output
+Frontend/dist/
+dist/
+build/
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Docker
+.dockerignore
