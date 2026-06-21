@@ -110,11 +110,11 @@ export default function SearchAutocomplete() {
 
   return (
     <div ref={searchRef} className="flex-grow mx-10 relative hidden lg:block w-full md:w-auto">
-      <form onSubmit={handleSearchSubmit} className="relative w-full">
+      <form onSubmit={handleSearchSubmit} className="search-bar-wrapper flex items-center bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg overflow-hidden relative w-full shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all duration-300">
         <input
           type="text"
           placeholder="Tìm kiếm sản phẩm..."
-          className="w-full p-2.5 rounded border-none text-sm text-black focus:outline-none"
+          className="search-input w-full py-2.5 pl-4 pr-12 text-sm text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-300 bg-transparent focus:outline-none border-none"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -122,23 +122,23 @@ export default function SearchAutocomplete() {
         />
         <button
           type="submit"
-          className="absolute right-0 top-0 h-full w-10 border-none bg-[#ddd] cursor-pointer rounded-r hover:bg-[#ccc] transition"
+          className="search-button absolute right-0 top-0 h-full w-11 flex items-center justify-center bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 border-l border-gray-200 dark:border-l-slate-700 text-gray-600 dark:text-slate-300 transition cursor-pointer"
         >
           <i className="fa fa-search" />
         </button>
 
         {/* Autocomplete Dropdown */}
         {isOpen && (
-          <div className="absolute top-full left-0 right-0 bg-white border border-[#ddd] shadow-xl rounded-b mt-0 z-[1001] max-h-[500px] overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-2xl rounded-b-xl mt-0.5 z-[1001] max-h-[500px] overflow-y-auto">
             {isLoading && (
-              <div className="p-4 text-center text-gray-500 text-sm">
+              <div className="p-4 text-center text-gray-500 dark:text-slate-400 text-sm">
                 Đang tìm kiếm...
               </div>
             )}
 
             {!isLoading && suggestions.length > 0 && (
               <>
-                <div className="px-4 py-2 bg-gray-100 border-b border-gray-200 text-xs text-gray-600 font-semibold">
+                <div className="px-4 py-2 bg-gray-50 dark:bg-slate-900/60 border-b border-gray-100 dark:border-slate-700 text-xs text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider">
                   SẢN PHẨM
                 </div>
                 {suggestions.map((suggestion, index) => (
@@ -146,16 +146,16 @@ export default function SearchAutocomplete() {
                     key={suggestion._id || index}
                     onClick={() => handleSelectSuggestion(suggestion)}
                     onMouseEnter={() => setSelectedIndex(index)}
-                    className={`px-4 py-3 cursor-pointer border-b border-gray-100 last:border-b-0 transition ${
+                    className={`px-4 py-3 cursor-pointer border-b border-gray-50 dark:border-slate-700/50 last:border-b-0 transition-colors duration-150 ${
                       selectedIndex === index
-                        ? "bg-blue-50"
-                        : "hover:bg-gray-50"
+                        ? "bg-red-50 dark:bg-slate-700/50"
+                        : "hover:bg-gray-50 dark:hover:bg-slate-700/20"
                     }`}
                   >
-                    <div className="text-sm text-gray-800 font-medium truncate">
+                    <div className="text-sm text-gray-800 dark:text-slate-200 font-semibold truncate">
                       {suggestion.name}
                     </div>
-                    <div className="text-xs text-gray-500 truncate">
+                    <div className="text-xs text-gray-400 dark:text-slate-500 truncate mt-0.5">
                       {suggestion.slug}
                     </div>
                   </div>
@@ -164,7 +164,7 @@ export default function SearchAutocomplete() {
             )}
 
             {!isLoading && searchQuery && suggestions.length === 0 && (
-              <div className="p-4 text-center text-gray-500 text-sm">
+              <div className="p-4 text-center text-gray-500 dark:text-slate-400 text-sm">
                 Không tìm thấy sản phẩm nào
               </div>
             )}
@@ -172,7 +172,7 @@ export default function SearchAutocomplete() {
             {searchQuery && suggestions.length > 0 && (
               <div
                 onClick={handleSearchSubmit}
-                className="px-4 py-3 bg-blue-500 text-white text-sm cursor-pointer hover:bg-blue-600 transition text-center font-medium"
+                className="px-4 py-3 bg-primary hover:bg-red-700 text-white text-sm cursor-pointer transition text-center font-bold"
               >
                 Xem tất cả kết quả tìm kiếm ({searchQuery})
               </div>
