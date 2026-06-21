@@ -3,19 +3,20 @@ import React, { useState, useEffect, useCallback } from "react";
 import { fetchApi } from "../../utils/api";
 import { toast } from "react-toastify";
 import Pagination from "../../components/Pagination";
+import ConfirmModal from "../../components/ConfirmModal";
 
 const STATUSES = [
   "pending",
   "confirmed",
-  "delivering",
-  "completed",
+  "shipping",
+  "delivered",
   "cancelled",
 ];
 const STATUS_COLORS = {
   pending: "bg-yellow-100 text-yellow-800",
   confirmed: "bg-blue-100 text-blue-800",
-  delivering: "bg-indigo-100 text-indigo-800",
-  completed: "bg-green-100 text-green-800",
+  shipping: "bg-indigo-100 text-indigo-800",
+  delivered: "bg-green-100 text-green-800",
   cancelled: "bg-red-100 text-red-800",
 };
 
@@ -63,14 +64,25 @@ export default function AdminOrdersPage() {
     fetchOrders(1, "");
   };
 
-  const handleUpdateStatus = async (orderId, orderCode, newStatus) => {
-    if (
-      !window.confirm(
-        `Bạn có chắc chắn muốn chuyển trạng thái đơn hàng ${orderCode || '#' + orderId.slice(-6).toUpperCase()} sang ${newStatus.toUpperCase()}?`
-      )
-    ) {
-      return;
-    }
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    orderId: null,
+    orderCode: null,
+    newStatus: null,
+  });
+
+  const handleUpdateStatusClick = (orderId, orderCode, newStatus) => {
+    setConfirmModal({
+      isOpen: true,
+      orderId,
+      orderCode,
+      newStatus,
+    });
+  };
+
+  const confirmUpdateStatus = async () => {
+    const { orderId, orderCode, newStatus } = confirmModal;
+    setConfirmModal({ isOpen: false, orderId: null, orderCode: null, newStatus: null });
 
     try {
       // API cập nhật trạng thái đơn hàng
@@ -81,7 +93,7 @@ export default function AdminOrdersPage() {
       toast.success(
         `Cập nhật trạng thái đơn hàng ${orderCode || '#' + orderId.slice(-6).toUpperCase()} thành công.`
       );
-      fetchOrders(pagination.page); // Tải lại trang hiện tại
+      fetchOrders(pagination.page, searchQuery); // Tải lại trang hiện tại
     } catch (error) {
       toast.error(error.message || "Cập nhật trạng thái thất bại.");
     }
@@ -182,11 +194,11 @@ export default function AdminOrdersPage() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <select
-                    defaultValue={order.status}
+                    value={order.status}
                     onChange={(e) =>
-                      handleUpdateStatus(order._id, order.orderCode, e.target.value)
+                      handleUpdateStatusClick(order._id, order.orderCode, e.target.value)
                     }
-                    className="border border-gray-300 rounded-md p-1 text-sm"
+                    className="border border-gray-300 rounded-md p-1 text-sm bg-white dark:bg-slate-700 text-gray-800 dark:text-slate-100 cursor-pointer"
                   >
                     {STATUSES.map((s) => (
                       <option key={s} value={s}>
@@ -208,6 +220,36 @@ export default function AdminOrdersPage() {
           onPageChange={handlePageChange}
         />
       </div>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title="Xác Nhận Thay Đổi"
+        message={
+          confirmModal.isOpen && (
+            <span>
+              Bạn có chắc chắn muốn chuyển trạng thái đơn hàng{" "}
+              <strong className="font-mono text-gray-800 dark:text-white bg-gray-100 dark:bg-slate-900 px-1.5 py-0.5 rounded border border-gray-200 dark:border-slate-700 font-bold">
+                {confirmModal.orderCode || `#${confirmModal.orderId.slice(-6).toUpperCase()}`}
+              </strong>{" "}
+              sang trạng thái{" "}
+              <strong className="uppercase font-bold text-red-600 dark:text-red-400">
+                {confirmModal.newStatus.toUpperCase()}
+              </strong>
+              ?
+            </span>
+          )
+        }
+        type="warning"
+        onConfirm={confirmUpdateStatus}
+        onCancel={() =>
+          setConfirmModal({
+            isOpen: false,
+            orderId: null,
+            orderCode: null,
+            newStatus: null,
+          })
+        }
+      />
     </div>
   );
 }
