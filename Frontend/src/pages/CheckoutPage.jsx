@@ -83,7 +83,7 @@ export default function CheckoutPage() {
     try {
       // 3. Chuẩn bị dữ liệu cho API theo cấu trúc Order Model của Backend
       const orderItems = cartItems.map((item) => ({
-        productId: item.originalProductId || item.id, // Sử dụng ID sản phẩm thật từ Backend
+        productId: item.productId, // ID sản phẩm thật từ Backend (MongoDB ObjectId)
         name: item.name,
         price: item.price,
         image: item.imageUrl,
@@ -123,13 +123,9 @@ export default function CheckoutPage() {
       // 5. Thành công: Xóa giỏ hàng
       await clearCart();
 
-      // 6. Hiển thị thông báo thành công
-      toast.success(`Đặt hàng thành công! Mã đơn hàng: ${response.data?.orderCode || ''}`);
-
-      // 7. Chuyển người dùng đến trang "Cảm ơn"
-      setTimeout(() => {
-        navigate("/dat-hang-thanh-cong");
-      }, 1500);
+      // 6. Chuyển thẳng đến trang "Cảm ơn" (không cần toast vì trang đó đã có card thành công)
+      const orderCode = response.data?.orderCode || '';
+      navigate("/dat-hang-thanh-cong", { state: { orderCode } });
     } catch (error) {
       console.error("Lỗi khi đặt hàng:", error);
       toast.error(error.message || "Đặt hàng thất bại. Vui lòng thử lại.");
@@ -242,96 +238,17 @@ export default function CheckoutPage() {
 
           {/* Form phương thức thanh toán */}
           <h2 className="text-2xl font-bold">Phương thức thanh toán</h2>
-          <div className="bg-white p-6 rounded-lg shadow-sm flex flex-col gap-4">
-            {/* Lựa chọn 1: COD */}
-            <div
-              onClick={() => setPaymentMethod("cod")}
-              className={`border p-4 rounded-md cursor-pointer transition-all ${
-                paymentMethod === "cod" ? "border-primary bg-red-50" : "hover:border-gray-400"
-              }`}
-            >
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <div className="border border-primary bg-red-50/50 dark:bg-slate-800/50 p-4 rounded-md">
               <div className="flex items-center gap-3">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="cod"
-                  checked={paymentMethod === "cod"}
-                  onChange={() => setPaymentMethod("cod")}
-                  className="w-5 h-5 accent-primary cursor-pointer"
-                />
-                <span className="font-bold">Thanh Toán Khi Nhận Hàng (COD)</span>
+                <i className="fas fa-money-bill-wave text-primary text-xl" />
+                <span className="font-bold text-gray-800 dark:text-slate-100">
+                  Thanh Toán Khi Nhận Hàng (COD)
+                </span>
               </div>
-              {paymentMethod === "cod" && (
-                <p className="text-sm text-gray-600 mt-3 pl-8">
-                  Bạn sẽ thanh toán bằng tiền mặt khi nhận hàng tại nhà.
-                </p>
-              )}
-            </div>
-
-            {/* Lựa chọn 2: Chuyển khoản ngân hàng */}
-            <div
-              onClick={() => setPaymentMethod("bank_transfer")}
-              className={`border p-4 rounded-md cursor-pointer transition-all ${
-                paymentMethod === "bank_transfer" ? "border-primary bg-red-50" : "hover:border-gray-400"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="bank_transfer"
-                  checked={paymentMethod === "bank_transfer"}
-                  onChange={() => setPaymentMethod("bank_transfer")}
-                  className="w-5 h-5 accent-primary cursor-pointer"
-                />
-                  <span className="font-bold">Chuyển khoản ngân hàng</span>
-              </div>
-
-              {paymentMethod === "bank_transfer" && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-md">
-                  <p className="font-bold mb-3 text-center">Quét mã QR để thanh toán</p>
-                  <div className="flex justify-center">
-                    <img
-                      src={`https://img.vietqr.io/image/970415-0981972950-compact2.png?amount=${totalPrice}&addInfo=THANHTOAN`}
-                      alt="Mã QR Chuyển khoản"
-                      className="w-64 h-auto border rounded-lg"
-                    />
-                  </div>
-                  <div className="mt-4 text-sm text-center space-y-1">
-                    <p><strong>Ngân hàng:</strong> Vietinbank</p>
-                    <p><strong>Số tài khoản:</strong> 0981972950</p>
-                    <p><strong>Chủ tài khoản:</strong> NGUYEN QUANG TU</p>
-                    <p className="text-primary font-semibold mt-2">
-                      Nội dung: THANHTOAN [Mã đơn hàng của bạn]
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Lựa chọn 3: VNPay (Coming Soon) */}
-            <div className="border p-4 rounded-md bg-gray-100 cursor-not-allowed opacity-60">
-              <div className="flex items-center gap-3">
-                <input
-                  type="radio"
-                  disabled
-                  className="w-5 h-5"
-                />
-                
-                <span className="font-bold text-gray-500">VNPay</span>
-              </div>
-            </div>
-
-            {/* Lựa chọn 4: MoMo (Coming Soon) */}
-            <div className="border p-4 rounded-md bg-gray-100 cursor-not-allowed opacity-60">
-              <div className="flex items-center gap-3">
-                <input
-                  type="radio"
-                  disabled
-                  className="w-5 h-5"
-                />
-                <span className="font-bold text-gray-500 text-2xl">MoMo </span>
-              </div>
+              <p className="text-sm text-gray-600 dark:text-slate-300 mt-2 pl-8">
+                Bạn sẽ thanh toán bằng tiền mặt khi nhận hàng tại nhà.
+              </p>
             </div>
           </div>
 
