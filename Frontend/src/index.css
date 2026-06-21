@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,7 +9,7 @@
 */
 @layer base {
   body {
-    @apply font-['Arial',_sans-serif] bg-light-gray text-[#333];
+    @apply font-['Inter',_sans-serif] bg-light-gray text-[#333] dark:bg-gray-900 dark:text-gray-100;
   }
 
   * {
@@ -35,12 +37,12 @@
 
   /* Card Styles */
   .card {
-    @apply bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300;
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-all duration-300;
   }
 
   /* Input Styles */
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200;
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100;
   }
 
   /* Container with max-width */
@@ -52,7 +54,11 @@
 @layer utilities {
   /* Custom Animations */
   .animate-fade-in {
-    animation: fadeIn 0.5s ease-in-out;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .animate-scale-up {
+    animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .animate-slide-up {
@@ -75,11 +81,11 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-track {
-    @apply bg-gray-100;
+    @apply bg-gray-100 dark:bg-gray-800;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    @apply bg-gray-400 rounded-full hover:bg-gray-500;
+    @apply bg-gray-400 dark:bg-gray-600 rounded-full hover:bg-gray-500;
   }
 }
 
@@ -90,6 +96,16 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
   }
 }
 
@@ -122,8 +138,391 @@
   }
 }
 
+/* Dark mode utilities */
+.dark .dark-bg-surface {
+  background-color: #1f2937;
+}
+.dark .dark-text-muted {
+  @apply text-gray-400;
+}
+
 /* Smooth transitions for dark mode (if needed) */
 * {
   @apply transition-colors duration-200;
 }
+
+/* ===== DARK MODE STYLES ===== */
+/* Khi <html> có class "dark", áp dụng các style này */
+
+html.dark body {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+/* Background tổng thể */
+html.dark .bg-white        { background-color: #1e293b !important; }
+html.dark .bg-gray-50      { background-color: #0f172a !important; }
+html.dark .bg-gray-100     { background-color: #1e293b !important; }
+html.dark .bg-gray-200     { background-color: #334155 !important; }
+html.dark .bg-gray-300     { background-color: #475569 !important; }
+html.dark .bg-gray-400     { background-color: #64748b !important; }
+html.dark .bg-light-gray   { background-color: #0f172a !important; }
+
+/* Backgrounds màu nhạt (thường dùng làm card, status badge, alert, active selection) */
+html.dark .bg-red-50        { background-color: #3b1820 !important; }
+html.dark .bg-green-50      { background-color: #0d2e20 !important; }
+html.dark .bg-blue-50       { background-color: #0f2d4a !important; }
+html.dark .bg-yellow-50     { background-color: #3d2d10 !important; }
+html.dark .bg-amber-50      { background-color: #3d2d10 !important; }
+html.dark .bg-indigo-50     { background-color: #1e224b !important; }
+
+/* Hover states trong menu/autocomplete/dropdown */
+html.dark .hover\:bg-gray-50:hover { background-color: #27354d !important; }
+html.dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
+html.dark .hover\:bg-gray-300:hover { background-color: #334155 !important; }
+html.dark .hover\:bg-gray-400:hover { background-color: #475569 !important; }
+
+/* Text màu & Link nổi bật */
+html.dark .text-gray-900   { color: #f8fafc !important; }
+html.dark .text-gray-800   { color: #f1f5f9 !important; }
+html.dark .text-gray-700   { color: #cbd5e1 !important; }
+html.dark .text-gray-600   { color: #94a3b8 !important; }
+html.dark .text-gray-500   { color: #64748b !important; }
+html.dark .text-\[\#333\]  { color: #f1f5f9 !important; }
+
+/* Text của các status badge và links */
+html.dark .text-red-600     { color: #fca5a5 !important; }
+html.dark .text-green-600   { color: #86efac !important; }
+html.dark .text-blue-600    { color: #93c5fd !important; }
+html.dark .text-indigo-600  { color: #a5b4fc !important; }
+html.dark .text-yellow-600  { color: #fde047 !important; }
+html.dark .text-amber-700   { color: #fcd34d !important; }
+
+/* Border */
+html.dark .border           { border-color: #334155 !important; }
+html.dark .border-gray-100  { border-color: #1e293b !important; }
+html.dark .border-gray-200  { border-color: #334155 !important; }
+html.dark .border-gray-300  { border-color: #475569 !important; }
+html.dark .border-red-200   { border-color: #881337 !important; }
+html.dark .border-yellow-200 { border-color: #78350f !important; }
+html.dark .border-blue-200  { border-color: #1e3a8a !important; }
+html.dark .border-green-200 { border-color: #064e3b !important; }
+html.dark .divide-gray-100 > * { border-color: #1e293b !important; }
+
+/* Card / Panel */
+html.dark .shadow-sm        { box-shadow: 0 1px 3px rgba(0,0,0,0.5) !important; }
+html.dark .shadow-md        { box-shadow: 0 4px 6px rgba(0,0,0,0.5) !important; }
+html.dark .shadow-lg        { box-shadow: 0 10px 15px rgba(0,0,0,0.6) !important; }
+html.dark .shadow-xl        { box-shadow: 0 20px 25px rgba(0,0,0,0.6) !important; }
+
+/* Input fields */
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+  border-color: #334155 !important;
+}
+
+html.dark input:focus,
+html.dark textarea:focus,
+html.dark select:focus {
+  border-color: #e50914 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #475569 !important;
+}
+
+/* Product card */
+html.dark .product-card {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+/* Scrollbar dark mode */
+html.dark ::-webkit-scrollbar-track { background: #0f172a; }
+html.dark ::-webkit-scrollbar-thumb { background: #e50914; }
+
+/* ===== BỔ SUNG CẢI TIẾN DARK MODE PHÂN CẤP TƯƠNG PHẢN ===== */
+/* Header & Navbar dark mode overrides */
+html.dark .bg-dark-color { 
+  background-color: #0b0f19 !important; 
+  border-bottom: 1px solid #1e293b !important; 
+}
+html.dark .bg-\[\#333\] { 
+  background-color: #0f172a !important; 
+  border-bottom: 1px solid #1e293b !important;
+}
+html.dark .bg-\[\#222\] { 
+  background-color: #1e293b !important; 
+}
+html.dark .hover\:bg-\[\#555\]:hover { 
+  background-color: #334155 !important; 
+}
+html.dark .border-b-\[\#444\] { 
+  border-bottom-color: #1e293b !important; 
+}
+
+/* Custom elements and overrides */
+html.dark .dropdown-single-column,
+html.dark .user-dropdown,
+html.dark .submenu {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .dropdown-single-column a,
+html.dark .user-dropdown a,
+html.dark .submenu a {
+  color: #cbd5e1 !important;
+}
+
+html.dark .dropdown-single-column a:hover,
+html.dark .user-dropdown a:hover,
+html.dark .submenu a:hover {
+  background-color: #334155 !important;
+  color: #ffffff !important;
+}
+
+/* Borders and lines */
+html.dark .border,
+html.dark .border-t,
+html.dark .border-b,
+html.dark .border-l,
+html.dark .border-r,
+html.dark .border-gray-200,
+html.dark .border-gray-300 {
+  border-color: #334155 !important;
+}
+
+/* Tables */
+html.dark th {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border-bottom: 2px solid #334155 !important;
+}
+
+html.dark td {
+  border-bottom: 1px solid #334155 !important;
+}
+
+/* Buttons custom overrides in dark mode */
+html.dark .bg-gray-800 {
+  background-color: #334155 !important;
+}
+html.dark .bg-gray-800:hover {
+  background-color: #e50914 !important;
+}
+
+/* Modals */
+html.dark .modal-content,
+html.dark .modal-box {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #334155 !important;
+}
+
+/* Success banner / alert / boxes in dark mode */
+html.dark .bg-red-50 {
+  background-color: #2e1d24 !important;
+  border-color: #ef4444 !important;
+}
+html.dark .text-gray-600 {
+  color: #cbd5e1 !important;
+}
+html.dark .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+/* Custom React Toastify Styles to look like centered, rounded premium cards with Chime Sound */
+.Toastify__toast-container {
+  width: 100% !important;
+  max-width: 450px !important;
+  padding: 16px !important;
+}
+
+.Toastify__toast {
+  font-family: 'Inter', sans-serif !important;
+  border-radius: 16px !important;
+  padding: 16px 20px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.3s ease !important;
+}
+
+.Toastify__toast-body {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: inherit !important;
+}
+
+/* Light Mode Styles */
+.Toastify__toast--success {
+  background-color: #f0fdf4 !important;
+  color: #15803d !important;
+  border: 1px solid #bbf7d0 !important;
+}
+
+.Toastify__toast--error {
+  background-color: #fef2f2 !important;
+  color: #b91c1c !important;
+  border: 1px solid #fecaca !important;
+}
+
+.Toastify__toast--info {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+.Toastify__toast--warning {
+  background-color: #fffbeb !important;
+  color: #b45309 !important;
+  border: 1px solid #fde68a !important;
+}
+
+/* Dark Mode Styles */
+html.dark .Toastify__toast--success {
+  background-color: #064e3b !important;
+  color: #a7f3d0 !important;
+  border: 1px solid #047857 !important;
+}
+
+html.dark .Toastify__toast--error {
+  background-color: #7f1d1d !important;
+  color: #fecaca !important;
+  border: 1px solid #b91c1c !important;
+}
+
+html.dark .Toastify__toast--info {
+  background-color: #1e3a8a !important;
+  color: #bfdbfe !important;
+  border: 1px solid #1d4ed8 !important;
+}
+
+html.dark .Toastify__toast--warning {
+  background-color: #78350f !important;
+  color: #fde68a !important;
+  border: 1px solid #b45309 !important;
+}
+
+.Toastify__close-button {
+  color: inherit !important;
+  opacity: 0.6 !important;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1 !important;
+}
+
+.Toastify__progress-bar {
+  display: none !important;
+}
+
+/* --- SOFT PREMIUM CORNERS FOR SQUARE/RECTANGULAR ELEMENTS --- */
+/* Override standard Tailwind rounded classes to make everything softer, less sharp, and premium */
+.rounded-sm {
+  border-radius: 6px !important;
+}
+
+.rounded, 
+.rounded-md {
+  border-radius: 12px !important;
+}
+
+.rounded-lg {
+  border-radius: 16px !important;
+}
+
+.rounded-xl {
+  border-radius: 20px !important;
+}
+
+.rounded-2xl {
+  border-radius: 24px !important;
+}
+
+/* Ensure images (which are often sharp squares/rectangles) are beautifully rounded by default */
+img:not(.rounded-full) {
+  border-radius: 12px !important;
+}
+
+/* Ensure form input fields, textareas, and select boxes are nicely rounded */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="search"],
+textarea,
+select {
+  border-radius: 12px !important;
+}
+
+/* Make sure container with rounded corners and overflow hidden wraps everything nicely */
+.overflow-hidden {
+  overflow: hidden !important;
+}
+
+/* --- PREMIUM DROPDOWN MENUS (SOFT CORNERS & MODERN LOOK) --- */
+/* Main Navigation bar and Dropdown hover effects */
+.main-nav a,
+.nav-links a {
+  border-radius: 8px !important;
+}
+
+/* Dropdown containers style overrides */
+.dropdown-single-column,
+.submenu {
+  border-radius: 16px !important; /* Soft corners for the menu wrapper */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  overflow: hidden !important;
+  padding: 8px !important; /* Add spacing around items */
+  background-color: #333 !important; /* Base color in light mode */
+}
+
+/* Rounded corners for individual menu items (like "TẤT CẢ SẢN PHẨM") */
+.dropdown-single-column a,
+.submenu a {
+  border-radius: 8px !important; /* Soft corners for item hover background */
+  margin: 2px 0 !important; /* Add spacing between items */
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* Customize hover backgrounds to match */
+.dropdown-single-column a:hover,
+.submenu a:hover {
+  background-color: #555 !important; /* A slightly lighter grey for hover in light mode/dark mode */
+  color: #fff !important;
+}
+
+/* User dropdown items soft styling */
+.user-dropdown a {
+  border-radius: 8px !important;
+  margin: 2px 6px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* Also for Dark Mode support */
+html.dark .dropdown-single-column,
+html.dark .submenu {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+html.dark .dropdown-single-column a:hover,
+html.dark .submenu a:hover {
+  background-color: #334155 !important;
+}
+
+
 
