@@ -7,6 +7,7 @@ import BrandCard from "../components/BrandCard";
 import PositionCard from "../components/PositionCard";
 import { Link } from "react-router-dom";
 import { fetchApi } from "../utils/api"; // THÊM: Import fetchApi
+import { SkeletonCard } from "../components/LoadingSkeleton";
 
 // Dữ liệu tĩnh cho Banner (giữ lại vì không có API trả về URL ảnh banner)
 const categoriesStatic = [
@@ -105,7 +106,7 @@ export default function HomePage() {
         linkUrl: `/san-pham?brand=${b.slug}`,
         // Dùng ảnh tĩnh được ánh xạ theo tên
         imageUrl:
-          BRAND_IMAGE_MAPPING[b.name] || "https://via.placeholder.com/300",
+          BRAND_IMAGE_MAPPING[b.name] || "https://placehold.co/300x300?text=No+Image",
         // Lưu thêm brand ID để có thể dùng sau này
         brandId: b._id,
         brandSlug: b.slug,
@@ -156,7 +157,7 @@ export default function HomePage() {
                   className="w-full h-auto object-cover"
                 />
               </div>
-              <h4 className="category-card-caption caption-red text-sm uppercase font-bold mt-2.5 text-center px-2.5 text-gray-800 transition-colors group-hover:text-green-800">
+              <h4 className="category-card-caption caption-red text-sm uppercase font-bold mt-2.5 text-center px-2.5 text-gray-800 dark:text-gray-200 transition-colors group-hover:text-green-800">
                 GIÀY ĐÁ BANH TRẺ EM
               </h4>
             </Link>
@@ -172,7 +173,7 @@ export default function HomePage() {
                   className="w-full h-auto object-cover"
                 />
               </div>
-              <h4 className="category-card-caption caption-green text-sm uppercase font-bold mt-2.5 text-center px-2.5 text-gray-800 transition-colors group-hover:text-green-800">
+              <h4 className="category-card-caption caption-green text-sm uppercase font-bold mt-2.5 text-center px-2.5 text-gray-800 dark:text-gray-200 transition-colors group-hover:text-green-800">
                 ÁO BÓNG ĐÁ CHÍNH HÃNG
               </h4>
             </Link>
@@ -188,7 +189,7 @@ export default function HomePage() {
                   className="w-full h-auto object-cover"
                 />
               </div>
-              <h4 className="category-card-caption caption-green text-sm uppercase font-bold mt-2.5 text-center px-2.5 text-gray-800 transition-colors group-hover:text-green-800">
+              <h4 className="category-card-caption caption-green text-sm uppercase font-bold mt-2.5 text-center px-2.5 text-gray-800 dark:text-gray-200 transition-colors group-hover:text-green-800">
                 QUẢ BÓNG ĐÁ
               </h4>
             </Link>
@@ -198,9 +199,11 @@ export default function HomePage() {
         {/* PHẦN THƯƠNG HIỆU (ĐÃ DÙNG DỮ LIỆU ĐỘNG) */}
         <Section title="THƯƠNG HIỆU">
           {loading ? (
-            <p className="text-center text-gray-600">
-              Đang tải danh sách thương hiệu...
-            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
           ) : (
             <div className="brand-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {dynamicBrands.map((brand, index) => (
