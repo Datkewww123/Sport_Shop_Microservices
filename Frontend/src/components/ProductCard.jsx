@@ -15,69 +15,67 @@ export default function ProductCard({ product }) {
     : null;
 
   return (
-    // Card phóng to mạnh hơn khi hover
-    <div className="product-card bg-white rounded-xl shadow-sm hover:shadow-2xl overflow-visible transition-all duration-300 group border border-gray-100 hover:scale-110 hover:z-20 relative">
+    // Card phóng to mạnh hơn khi hover, sử dụng flex flex-col h-full để đồng bộ chiều cao
+    <div className="product-card flex flex-col h-full bg-white rounded-xl shadow-sm hover:shadow-2xl overflow-hidden transition-all duration-300 group border border-gray-100 hover:-translate-y-2 relative">
       <Link to={productUrl} className="block relative overflow-hidden bg-gray-50 rounded-t-xl">
         {/* Discount Badge */}
-        {discountPercentage && discountPercentage > 0 && (
+        {discountPercentage !== null && discountPercentage > 0 ? (
           <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1.5 rounded-md text-xs font-bold z-10 shadow-lg">
             -{discountPercentage}%
           </div>
-        )}
+        ) : null}
         
         <img
-          src={product.imageUrl}
+          src={product.imageUrl || "https://placehold.co/300x300?text=No+Image"}
           alt={product.name}
           className="w-full h-auto aspect-square object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
+          onError={(e) => {
+            e.currentTarget.src = "https://placehold.co/300x300?text=No+Image";
+          }}
         />
       </Link>
 
-      <div className="p-5 group-hover:p-6 transition-all duration-300">
-        {/* Tên sản phẩm */}
-        <h3 className="text-sm group-hover:text-base font-semibold text-gray-700 mb-3 line-clamp-2 group-hover:line-clamp-none leading-relaxed transition-all duration-300">
+      {/* flex-grow giúp phần thân giãn đều và đẩy nút xuống dưới cùng */}
+      <div className="p-5 flex flex-col flex-grow">
+        {/* Tên sản phẩm - Cố định chiều cao h-10 (tương đương 2 dòng chữ) để luôn thẳng hàng */}
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-200 mb-2 line-clamp-2 h-10 leading-snug">
           <Link to={productUrl} className="hover:text-primary transition-colors duration-200">
             {product.name}
           </Link>
         </h3>
 
-        {/* Brand - Hiện khi hover */}
-        {product.brand && (
-          <p className="text-xs text-gray-500 mb-2 opacity-0 group-hover:opacity-100 max-h-0 group-hover:max-h-10 overflow-hidden transition-all duration-300">
-            Thương hiệu: <span className="font-medium">{product.brand}</span>
-          </p>
-        )}
+        {/* Brand - Hiển thị tĩnh hoặc dùng khoảng trắng nếu không có để giữ vị trí thẳng hàng */}
+        <p className="text-xs text-gray-400 dark:text-slate-400 mb-2 truncate">
+          {product.brand ? `Thương hiệu: ${product.brand}` : '\u00A0'}
+        </p>
 
-        {/* Giá */}
-        <div className="mb-4 space-y-1">
+        {/* Giá - Chiều cao cố định h-12 flex-col để căn đều kể cả khi có giảm giá hoặc không */}
+        <div className="mb-4 h-12 flex flex-col justify-end">
           {product.originalPrice && product.originalPrice > product.price ? (
             <>
-              <p className="text-sm text-gray-400 line-through">
-                {product.originalPrice.toLocaleString("vi-VN")}₫
+              <p className="text-xs text-gray-400 line-through leading-none mb-1">
+                {product.originalPrice.toLocaleString("vi-VN")} đ
               </p>
-              <p className="text-lg group-hover:text-xl font-bold text-primary transition-all duration-300">
-                {product.price ? product.price.toLocaleString("vi-VN") : "0"}₫
+              <p className="text-base font-bold text-primary leading-none">
+                {product.price ? product.price.toLocaleString("vi-VN") : "0"} đ
               </p>
             </>
           ) : (
-            <p className="text-lg group-hover:text-xl font-bold text-primary transition-all duration-300">
-              {product.price ? product.price.toLocaleString("vi-VN") : "0"}₫
-            </p>
+            <>
+              <div className="h-3" /> {/* Khoảng trống bù chiều cao cho giá gốc */}
+              <p className="text-base font-bold text-primary leading-none">
+                {product.price ? product.price.toLocaleString("vi-VN") : "0"} đ
+              </p>
+            </>
           )}
         </div>
 
-        {/* Mô tả ngắn - Hiện khi hover */}
-        {product.description && (
-          <p className="text-xs text-gray-600 mb-3 line-clamp-2 opacity-0 group-hover:opacity-100 max-h-0 group-hover:max-h-20 overflow-hidden transition-all duration-300">
-            {product.description}
-          </p>
-        )}
-
-        {/* Tình trạng kho - Hiện always */}
-        <div className="mb-3">
+        {/* Tình trạng kho - Hiển thị tĩnh */}
+        <div className="mb-4 mt-auto">
           <p className="text-xs">
-            <span className={`inline-block w-2 h-2 rounded-full mr-1 ${product.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`}></span>
-            <span className="text-gray-600">
+            <span className={`inline-block w-2 h-2 rounded-full mr-1.5 ${product.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`}></span>
+            <span className="text-gray-500 dark:text-slate-400">
               {product.stock > 0 ? `Còn ${product.stock} sản phẩm` : 'Hết hàng'}
             </span>
           </p>
@@ -89,7 +87,7 @@ export default function ProductCard({ product }) {
           disabled={product.stock === 0}
           className={`w-full text-white text-sm font-semibold uppercase py-3 px-4 rounded-lg transition-all duration-300 hover:shadow-lg active:scale-95 flex items-center justify-center gap-2 ${
             product.stock > 0 
-              ? 'bg-gray-800 hover:bg-primary' 
+              ? 'bg-primary hover:bg-red-700' 
               : 'bg-gray-400 cursor-not-allowed'
           }`}
           aria-label={`Thêm ${product.name} vào giỏ hàng`}
