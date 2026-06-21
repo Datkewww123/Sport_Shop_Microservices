@@ -1,6 +1,20 @@
 // src/components/LoadingSkeleton.jsx
 import React from "react";
 
+export function SkeletonCard() {
+  return (
+    <div className="bg-white rounded-2xl overflow-hidden animate-pulse">
+      <div className="bg-gray-200 aspect-square w-full" />
+      <div className="p-4 space-y-3">
+        <div className="h-3 bg-gray-200 rounded w-full" />
+        <div className="h-3 bg-gray-200 rounded w-2/3" />
+        <div className="h-5 bg-gray-200 rounded w-1/2 mt-4" />
+        <div className="h-9 bg-gray-200 rounded-lg w-full mt-2" />
+      </div>
+    </div>
+  );
+}
+
 // Product Card Skeleton
 export function ProductCardSkeleton() {
   return (
@@ -63,6 +77,7 @@ export function ButtonLoading() {
 }
 
 export default {
+  SkeletonCard,
   ProductCardSkeleton,
   ProductGridSkeleton,
   CategoryCardSkeleton,
