@@ -147,7 +147,7 @@ export default function ProductListPage() {
         imageUrl:
           p.images?.length > 0
             ? p.images[0]
-            : "https://via.placeholder.com/300",
+            : "https://placehold.co/300x300?text=No+Image",
       }));
 
       console.log("Mapped Products:", products);
@@ -207,12 +207,12 @@ export default function ProductListPage() {
   if (loading) {
     return (
       <div className="container-custom mt-10">
-        <h1 className="text-2xl font-bold mb-6 animate-pulse text-gray-700">
+        <h1 className="text-2xl font-bold mb-6 animate-pulse text-gray-700 dark:text-gray-200">
           {productsData.categoryName || "Đang tải..."}
         </h1>
         <div className="flex flex-col md:flex-row gap-6">
           <aside className="w-full md:w-1/4">
-            <div className="bg-white rounded-lg shadow-md p-4 animate-pulse">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 animate-pulse">
               <div className="h-6 bg-gray-200 rounded mb-4" />
               <div className="space-y-2">
                 {[1, 2, 3, 4, 5].map(i => (
@@ -246,12 +246,12 @@ export default function ProductListPage() {
 
   // (Phần render đã cập nhật)
   return (
-    <div className="bg-gray-50 min-h-screen py-8">
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen py-8">
       <div className="container w-[90%] max-w-[1400px] mx-auto">
-        <h1 className="text-3xl font-bold mb-2 text-gray-800">
+        <h1 className="text-3xl font-bold mb-2 text-gray-800 dark:text-white">
           {productsData.categoryName}
         </h1>
-        <p className="text-gray-600 mb-8">{productsData.total} sản phẩm</p>
+        <p className="text-gray-600 dark:text-gray-400 mb-8">{productsData.total} sản phẩm</p>
 
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
           {/* Cột Trái (Sidebar) - Fixed width */}
@@ -281,7 +281,7 @@ export default function ProductListPage() {
               />
             )}
             {productsData.total === 0 && (
-              <p className="text-center text-xl py-10">
+              <p className="text-center text-xl py-10 dark:text-gray-300">
                 Không tìm thấy sản phẩm nào phù hợp với bộ lọc.
               </p>
             )}
