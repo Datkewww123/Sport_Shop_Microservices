@@ -26,7 +26,7 @@ export default function ProductGrid({ products, sortOrder, setSortOrder }) {
           id="sort-by"
           value={sortOrder}
           onChange={(e) => setSortOrder(e.target.value)}
-          className="border border-gray-300 rounded-md p-2 text-sm"
+          className="border border-gray-300 rounded-md p-2 text-sm bg-white dark:bg-slate-900 text-gray-800 dark:text-slate-100 border-gray-300 dark:border-slate-700 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
         >
           {sortOptions.map((option) => (
             <option key={option} value={option}>
