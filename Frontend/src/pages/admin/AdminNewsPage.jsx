@@ -2,12 +2,18 @@
 import React, { useState, useEffect } from "react";
 import { fetchApi } from "../../utils/api";
 import { toast } from "react-toastify";
+import ConfirmModal from "../../components/ConfirmModal";
 
 export default function AdminNewsPage() {
   const [newsList, setNewsList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editingNews, setEditingNews] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    newsId: null,
+    newsTitle: "",
+  });
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -83,11 +89,19 @@ export default function AdminNewsPage() {
     setShowModal(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa tin tức này?")) return;
+  const handleDeleteClick = (id, title) => {
+    setConfirmModal({
+      isOpen: true,
+      newsId: id,
+      newsTitle: title,
+    });
+  };
 
+  const confirmDeleteNews = async () => {
+    const { newsId } = confirmModal;
+    setConfirmModal({ isOpen: false, newsId: null, newsTitle: "" });
     try {
-      await fetchApi(`/news/${id}`, { method: "DELETE" });
+      await fetchApi(`/news/${newsId}`, { method: "DELETE" });
       toast.success("Xóa tin tức thành công!");
       loadNews();
     } catch (error) {
@@ -196,7 +210,7 @@ export default function AdminNewsPage() {
                       Sửa
                     </button>
                     <button
-                      onClick={() => handleDelete(news._id)}
+                      onClick={() => handleDeleteClick(news._id, news.title)}
                       className="text-red-600 hover:text-red-900"
                     >
                       Xóa
@@ -363,6 +377,24 @@ export default function AdminNewsPage() {
           </div>
         </div>
       )}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title="Xóa Tin Tức"
+        message={
+          confirmModal.isOpen && (
+            <span>
+              Bạn có chắc chắn muốn xóa bài viết tin tức{" "}
+              <strong className="font-semibold text-gray-800 dark:text-white">
+                "{confirmModal.newsTitle}"
+              </strong>
+              ? Hành động này không thể hoàn tác.
+            </span>
+          )
+        }
+        type="danger"
+        onConfirm={confirmDeleteNews}
+        onCancel={() => setConfirmModal({ isOpen: false, newsId: null, newsTitle: "" })}
+      />
     </div>
   );
 }
