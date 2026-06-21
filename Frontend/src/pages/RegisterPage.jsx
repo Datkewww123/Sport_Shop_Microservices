@@ -33,13 +33,13 @@ export default function RegisterPage() {
 
   return (
     <div className="container w-[90%] max-w-[500px] mx-auto mt-10 py-10">
-      <h1 className="text-3xl font-bold text-center mb-8">Tạo Tài Khoản Mới</h1>
+      <h1 className="text-3xl font-bold text-center mb-8 dark:text-white">Tạo Tài Khoản Mới</h1>
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-4 bg-white p-8 rounded-lg shadow-md"
+        className="flex flex-col gap-4 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md dark:shadow-gray-900/50"
       >
         <div>
-          <label htmlFor="name" className="block text-sm font-bold mb-1">
+          <label htmlFor="name" className="block text-sm font-bold mb-1 dark:text-gray-200">
             Họ và tên *
           </label>
           <input
@@ -48,11 +48,11 @@ export default function RegisterPage() {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-bold mb-1">
+          <label htmlFor="email" className="block text-sm font-bold mb-1 dark:text-gray-200">
             Email *
           </label>
           <input
@@ -61,12 +61,12 @@ export default function RegisterPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
           />
         </div>
         <div>
-          <label htmlFor="password" className="block text-sm font-bold mb-1">
-            Mật khẩu *
+          <label htmlFor="password" className="block text-sm font-bold mb-1 dark:text-gray-200">
+            Mật khẩu * <span className="font-normal text-xs text-gray-500 dark:text-gray-400">(ít nhất 8 ký tự, gồm chữ hoa, chữ thường và số)</span>
           </label>
           <input
             type="password"
@@ -74,13 +74,13 @@ export default function RegisterPage() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
           />
         </div>
         <div>
           <label
             htmlFor="confirmPassword"
-            className="block text-sm font-bold mb-1"
+            className="block text-sm font-bold mb-1 dark:text-gray-200"
           >
             Xác nhận mật khẩu *
           </label>
@@ -90,7 +90,7 @@ export default function RegisterPage() {
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
           />
         </div>
 
@@ -101,7 +101,7 @@ export default function RegisterPage() {
           Đăng ký
         </button>
 
-        <p className="text-center mt-2 text-sm">
+        <p className="text-center mt-2 text-sm dark:text-gray-300">
           Đã có tài khoản?{" "}
           <Link
             to="/dang-nhap"
