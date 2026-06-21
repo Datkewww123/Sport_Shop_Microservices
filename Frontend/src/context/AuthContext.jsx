@@ -22,6 +22,28 @@ const getInitialUser = () => {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(getInitialUser);
 
+  // Tự động làm mới thông tin user từ server khi app khởi động
+  // Đảm bảo role luôn được cập nhật mới nhất (tránh localStorage cũ)
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    fetchApi("/auth/profile")
+      .then((response) => {
+        const freshUser = response.data || response;
+        if (freshUser && freshUser._id) {
+          localStorage.setItem("user", JSON.stringify(freshUser));
+          setCurrentUser(freshUser);
+        }
+      })
+      .catch(() => {
+        // Token hết hạn hoặc không hợp lệ → đăng xuất
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setCurrentUser(null);
+      });
+  }, []);
+
   // Dùng useCallback để tránh re-render không cần thiết
   const login = async (email, password) => {
     try {
