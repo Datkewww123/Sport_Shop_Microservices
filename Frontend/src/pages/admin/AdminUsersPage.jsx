@@ -3,11 +3,17 @@ import React, { useState, useEffect, useCallback } from "react";
 import { fetchApi } from "../../utils/api";
 import { toast } from "react-toastify";
 import Pagination from "../../components/Pagination";
+import ConfirmModal from "../../components/ConfirmModal";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    userId: null,
+    userName: null,
+  });
 
   const fetchUsers = useCallback(async (page = 1) => {
     setLoading(true);
@@ -32,20 +38,24 @@ export default function AdminUsersPage() {
     fetchUsers(newPage);
   };
 
-  const handleDeleteUser = async (userId, userName) => {
-    if (
-      window.confirm(
-        `Bạn có chắc chắn muốn xóa tài khoản của người dùng ${userName}?`
-      )
-    ) {
-      try {
-        // API xóa người dùng
-        await fetchApi(`/users/${userId}`, { method: "DELETE" });
-        toast.success(`Đã xóa người dùng ${userName} thành công.`);
-        fetchUsers(pagination.page); // Tải lại trang hiện tại
-      } catch (error) {
-        toast.error(error.message || "Xóa người dùng thất bại.");
-      }
+  const handleDeleteClick = (userId, userName) => {
+    setConfirmModal({
+      isOpen: true,
+      userId,
+      userName,
+    });
+  };
+
+  const confirmDeleteUser = async () => {
+    const { userId, userName } = confirmModal;
+    setConfirmModal({ isOpen: false, userId: null, userName: null });
+    try {
+      // API xóa người dùng
+      await fetchApi(`/users/${userId}`, { method: "DELETE" });
+      toast.success(`Đã xóa người dùng ${userName} thành công.`);
+      fetchUsers(pagination.page); // Tải lại trang hiện tại
+    } catch (error) {
+      toast.error(error.message || "Xóa người dùng thất bại.");
     }
   };
 
@@ -108,7 +118,7 @@ export default function AdminUsersPage() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
-                    onClick={() => handleDeleteUser(user._id, user.name)}
+                    onClick={() => handleDeleteClick(user._id, user.name)}
                     className="text-red-600 hover:text-red-900 transition-colors disabled:opacity-50"
                     disabled={user.role === "admin"} // Ngăn không cho xóa admin khác
                   >
@@ -128,6 +138,25 @@ export default function AdminUsersPage() {
           onPageChange={handlePageChange}
         />
       </div>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title="Xóa Người Dùng"
+        message={
+          confirmModal.isOpen && (
+            <span>
+              Bạn có chắc chắn muốn xóa tài khoản của người dùng{" "}
+              <strong className="font-semibold text-gray-800 dark:text-white">
+                {confirmModal.userName}
+              </strong>
+              ? Hành động này không thể hoàn tác.
+            </span>
+          )
+        }
+        type="danger"
+        onConfirm={confirmDeleteUser}
+        onCancel={() => setConfirmModal({ isOpen: false, userId: null, userName: null })}
+      />
     </div>
   );
 }
