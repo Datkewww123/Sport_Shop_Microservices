@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext();
 
@@ -21,9 +22,11 @@ function saveCart(items) {
 }
 
 export function CartProvider({ children }) {
+  const { currentUser } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [modalData, setModalData] = useState({ isOpen: false, product: null, quantity: 1, selectedSize: null });
+  const [couponInfo, setCouponInfo] = useState(null);
 
   // Web Audio API để tổng hợp âm thanh "ting"
   const playChimeSound = () => {
@@ -52,12 +55,12 @@ export function CartProvider({ children }) {
     }
   };
 
-  // Tự động đóng modal sau 4 giây
+  // Tự động đóng modal sau 3 giây
   useEffect(() => {
     if (modalData.isOpen) {
       const timer = setTimeout(() => {
         setModalData((prev) => ({ ...prev, isOpen: false }));
-      }, 4000);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [modalData.isOpen]);
@@ -67,6 +70,10 @@ export function CartProvider({ children }) {
   }, []);
 
   const addToCart = useCallback(async (product, quantityToAdd = 1, selectedSize = null) => {
+    if (!currentUser) {
+      toast.warning("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.");
+      return;
+    }
     const items = loadCart();
     const existingIndex = items.findIndex(
       (item) => item.productId === product.id && item.selectedSize === (selectedSize || null)
@@ -100,7 +107,7 @@ export function CartProvider({ children }) {
     playChimeSound();
 
     return { success: true };
-  }, []);
+  }, [currentUser]);
 
   const updateQuantity = useCallback(async (itemId, newQuantity) => {
     if (newQuantity < 1) return;
@@ -146,6 +153,8 @@ export function CartProvider({ children }) {
     clearCart,
     resetCart,
     isLoading,
+    couponInfo,
+    setCouponInfo,
   };
 
   return (

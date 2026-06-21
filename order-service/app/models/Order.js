@@ -32,12 +32,13 @@ const orderSchema = new mongoose.Schema({
   subtotal: { type: Number, required: true, min: 0 }, // Tổng tiền hàng
   shippingFee: { type: Number, default: 0, min: 0 }, // Phí vận chuyển
   discount: { type: Number, default: 0, min: 0 }, // Giảm giá (nếu có)
+  couponCode: { type: String }, // Mã giảm giá đã áp dụng
   total: { type: Number, required: true, min: 0 }, // Tổng thanh toán
   
   // Payment
   paymentMethod: { 
     type: String, 
-    enum: ['cod', 'momo', 'vnpay', 'bank_transfer'], 
+    enum: ['cod', 'momo', 'bank_transfer'], 
     default: 'cod' 
   },
   paymentStatus: { 

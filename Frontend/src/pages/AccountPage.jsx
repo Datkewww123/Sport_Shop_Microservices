@@ -372,7 +372,7 @@ export default function AccountPage() {
   // LOGIC BẢO VỆ LỘ TRÌNH (PRIVATE ROUTE)
   useEffect(() => {
     if (currentUser === null) {
-      navigate("/dang-nhap");
+      navigate("/");
     }
   }, [currentUser, navigate]);
 

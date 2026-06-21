@@ -89,6 +89,7 @@ export function AuthProvider({ children }) {
       // Xóa localStorage dù API có lỗi hay không
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      localStorage.removeItem("cart");
       setCurrentUser(null);
       toast.info("Đã đăng xuất.");
     }

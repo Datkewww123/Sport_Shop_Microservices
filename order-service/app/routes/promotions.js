@@ -8,5 +8,6 @@ router.get('/', promotionController.getPromotions);
 router.post('/', auth, admin, promotionController.createPromotion);
 router.put('/:id', auth, admin, promotionController.updatePromotion);
 router.delete('/:id', auth, admin, promotionController.deletePromotion);
+router.post('/validate', promotionController.validateCoupon);
 
 module.exports = router;

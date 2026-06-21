@@ -17,9 +17,8 @@ exports.getStats = async (req, res) => {
       const prodRes = await fetch(`${catalogUrl}/api/products?limit=1`);
       if (prodRes.ok) {
         const prodData = await prodRes.json();
-        const stats = prodData.data || prodData;
-        if (stats.pagination) {
-          totalProducts = stats.pagination.total || 0;
+        if (prodData.pagination) {
+          totalProducts = prodData.pagination.total || 0;
         }
       }
     } catch (err) {
