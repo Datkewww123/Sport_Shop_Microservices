@@ -19,12 +19,14 @@ const { pickProductImages, pickCategoryImage } = require('./shoeImagePool');
 // ============================================================
 const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 
+const dbHost = process.env.MYSQL_HOST === 'mysql' ? '127.0.0.1' : (process.env.MYSQL_HOST || '127.0.0.1');
+
 const sequelize = new Sequelize(
   process.env.MYSQL_DATABASE || 'soap_catalog_db',
   process.env.MYSQL_USER || 'root',
   process.env.MYSQL_PASSWORD || 'rootpassword',
   {
-    host: process.env.MYSQL_HOST || '127.0.0.1',
+    host: dbHost,
     port: process.env.MYSQL_PORT || 3306,
     dialect: 'mysql',
     logging: false,
@@ -211,7 +213,16 @@ const CATEGORY_QUERIES = {
   'giay-bong-da':                 'soccer cleats boots -people',
   'giay-chay-bo':                 'running shoes product -people',
   'giay-bong-ro':                 'basketball shoes product -people',
-  'giay-tennis':                  'tennis shoes product -people'
+  'giay-tennis':                  'tennis shoes product -people',
+  'qua-bong-da':                  'soccer ball football product -people',
+  'boc-ong-dong':                 'soccer shin guards -people',
+  'gang-tay-thu-mon':             'goalkeeper gloves -people',
+  'vo-bong-da':                   'soccer socks -people',
+  'ao-bong-da-chinh-hang':        'football shirt jersey -people',
+  'phu-kien-ra-san':              'soccer training cones bottle -people',
+  'balo-tui-xach':                'sports backpack gym bag -people',
+  'bo-quan-ao-bong-da':           'soccer kit uniform -people',
+  'dep-chinh-hang':               'sport slides sandals -people'
 };
 
 const BRANDS_DATA = [
@@ -235,11 +246,23 @@ const CATEGORIES_DATA = [
   { name: 'Giày futsal',                   slug: 'giay-futsal',                   type: 'standard',    imageUrl: 'https://images.pexels.com/photos/14690051/pexels-photo-14690051.jpeg?auto=compress&cs=tinysrgb&w=800', description: 'Đế bằng chuyên dụng cho sân futsal trong nhà.' },
   { name: 'Giày training',                 slug: 'giay-training',                 type: 'standard',    imageUrl: 'https://images.pexels.com/photos/4753991/pexels-photo-4753991.jpeg?auto=compress&cs=tinysrgb&w=800', description: 'Đa năng cho các bài tập gym và cross-training.' },
   { name: 'Giày lifestyle',                slug: 'giay-lifestyle',                type: 'standard',    imageUrl: 'https://images.pexels.com/photos/12036893/pexels-photo-12036893.jpeg?auto=compress&cs=tinysrgb&w=800', description: 'Phong cách thể thao dùng cho đời thường.' },
+  
   // type: sport — hiện ở khu vực "CHỌN GIÀY THEO MÔN THỂ THAO"
   { name: 'Giày bóng đá',                  slug: 'giay-bong-da',                  type: 'sport',       imageUrl: 'https://images.pexels.com/photos/10923070/pexels-photo-10923070.jpeg?auto=compress&cs=tinysrgb&w=800', description: 'Hỗ trợ bứt tốc, xoay xở linh hoạt trên mọi mặt sân.' },
   { name: 'Giày chạy bộ',                  slug: 'giay-chay-bo',                  type: 'sport',       imageUrl: 'https://images.pexels.com/photos/15475641/pexels-photo-15475641.jpeg?auto=compress&cs=tinysrgb&w=800', description: 'Độ êm ái cao, giảm chấn và tối ưu từng bước chạy.' },
   { name: 'Giày bóng rổ',                  slug: 'giay-bong-ro',                  type: 'sport',       imageUrl: 'https://images.pexels.com/photos/12879628/pexels-photo-12879628.jpeg?auto=compress&cs=tinysrgb&w=800', description: 'Cổ cao bảo vệ khớp cổ chân, chống trơn trượt cực tốt.' },
   { name: 'Giày tennis',                   slug: 'giay-tennis',                   type: 'sport',       imageUrl: 'https://images.pexels.com/photos/9241609/pexels-photo-9241609.jpeg?auto=compress&cs=tinysrgb&w=800', description: 'Thiết kế bền bỉ, tối ưu lực đẩy cho các chuyển động ngang.' },
+
+  // PHỤ KIỆN DROPDOWN
+  { name: 'Quả bóng đá',                   slug: 'qua-bong-da',                   type: 'standard',    description: 'Quả bóng đá thi đấu chất lượng cao, độ nảy chuẩn.' },
+  { name: 'Bọc ống đồng',                  slug: 'boc-ong-dong',                  type: 'standard',    description: 'Bảo vệ ống đồng tránh chấn thương va chạm.' },
+  { name: 'Găng tay thủ môn',              slug: 'gang-tay-thu-mon',              type: 'standard',    description: 'Găng tay thủ môn bám bóng cao cấp, chống trơn trượt.' },
+  { name: 'Vớ bóng đá',                    slug: 'vo-bong-da',                    type: 'standard',    description: 'Vớ đá bóng êm ái, thấm hút mồ hôi tốt.' },
+  { name: 'Áo bóng đá chính hãng',          slug: 'ao-bong-da-chinh-hang',          type: 'standard',    description: 'Áo đấu chính hãng của các câu lạc bộ nổi tiếng.' },
+  { name: 'Phụ kiện ra sân',               slug: 'phu-kien-ra-san',               type: 'standard',    description: 'Còi, bình nước, băng trán, băng quấn cơ.' },
+  { name: 'Balo túi xách',                  slug: 'balo-tui-xach',                  type: 'standard',    description: 'Balo thể thao, túi trống đựng giày tiện lợi.' },
+  { name: 'Bộ quần áo bóng đá',            slug: 'bo-quan-ao-bong-da',            type: 'standard',    description: 'Bộ quần áo bóng đá thoáng mát cho đội bóng.' },
+  { name: 'Dép chính hãng',                 slug: 'dep-chinh-hang',                 type: 'standard',    description: 'Dép lê, slide thể thao êm ái sau trận đấu.' },
 ];
 
 // Sản phẩm thật với giá thị trường VN (VNĐ)
@@ -313,6 +336,239 @@ const PRODUCTS_TEMPLATE = [
   { name: 'Adidas NMD R1', brand: 'Adidas', category: 'giay-lifestyle', originalPrice: 3200000, price: 2750000, gender: 'unisex', sizes: ['36','37','38','39','40','41','42','43','44'], colors: ['Đen','Trắng','Xám/Đỏ'], stock: 32, sold: 112, rating: 4.7, reviews: 45, weight: 285, footType: 'thon', material: 'Primeknit', sole: 'Boost foam', tags: ['lifestyle','Adidas','NMD','boost'], isFeatured: false, isNewArrival: true, unsplashQuery: 'Adidas NMD R1 black sneaker boost lifestyle' },
 ];
 
+// Expand PRODUCTS_TEMPLATE to exactly 200 products dynamically to reach required diversity
+const brandsList = ['Nike', 'Adidas', 'Puma', 'Mizuno', 'Asics', 'NMS', 'Kamito', 'Zocker', 'Joma', 'Under Armour', 'New Balance'];
+const categorySpecs = {
+  'giay-bong-da-san-co-tu-nhien': {
+    nameTemplates: ['Vapor 15 Elite FG', 'Predator Elite FG', 'Future Ultimate FG', 'Morelia Neo IV FG', 'Tekela V4 FG'],
+    priceRange: [2000000, 6000000],
+    sizes: ['39', '40', '41', '42', '43'],
+    colors: [['Đỏ/Đen', 'Trắng'], ['Xanh/Trắng', 'Đen'], ['Cam/Đen']],
+    footType: 'thon',
+    material: 'Synthetic/Kangaroo Leather',
+    sole: 'FG studs',
+    query: 'soccer cleats FG'
+  },
+  'giay-bong-da-san-co-nhan-tao': {
+    nameTemplates: ['Vapor 15 Academy TF', 'Predator League TF', 'Future Play TF', 'Morelia Neo IV TF', 'Superfly 9 Club TF'],
+    priceRange: [1200000, 2800000],
+    sizes: ['39', '40', '41', '42', '43'],
+    colors: [['Xanh/Đen'], ['Trắng/Vàng'], ['Đen/Trắng']],
+    footType: 'unisex',
+    material: 'Synthetic Leather',
+    sole: 'TF studs',
+    query: 'soccer cleats TF'
+  },
+  'giay-futsal': {
+    nameTemplates: ['React Gato IC', 'Copa Pure IN', 'Top Flex IN', 'Stellar IN', 'Audazo V6 IN'],
+    priceRange: [800000, 2200000],
+    sizes: ['38', '39', '40', '41', '42'],
+    colors: [['Đen/Đỏ'], ['Trắng/Xanh'], ['Xám/Vàng']],
+    footType: 'be',
+    material: 'Synthetic/Leather',
+    sole: 'Non-marking rubber',
+    query: 'indoor soccer shoes'
+  },
+  'giay-training': {
+    nameTemplates: ['Metcon 9', 'Nano X3', 'Fuse 2.0', 'TriBase Reign 5', 'Minimus TR'],
+    priceRange: [1500000, 3500000],
+    sizes: ['37', '38', '39', '40', '41', '42', '43', '44'],
+    colors: [['Đen/Xám'], ['Trắng/Đỏ'], ['Xanh/Trắng']],
+    footType: 'unisex',
+    material: 'Mesh/Knit',
+    sole: 'Flat rubber',
+    query: 'training gym shoes'
+  },
+  'giay-lifestyle': {
+    nameTemplates: ['Air Force 1', 'Stan Smith', 'Suede Classic', '574 Retro', 'Air Max 90'],
+    priceRange: [1800000, 3800000],
+    sizes: ['36', '37', '38', '39', '40', '41', '42', '43', '44'],
+    colors: [['Trắng tinh'], ['Đen'], ['Xám cổ điển']],
+    footType: 'unisex',
+    material: 'Leather/Suede',
+    sole: 'Rubber cupsole',
+    query: 'sneaker lifestyle'
+  },
+  'giay-chay-bo': {
+    nameTemplates: ['Air Zoom Pegasus 40', 'Ultraboost Light', 'Fresh Foam X 1080', 'Wave Rider 27', 'FloRide 5'],
+    priceRange: [2200000, 4500000],
+    sizes: ['37', '38', '39', '40', '41', '42', '43', '44'],
+    colors: [['Xanh Neon'], ['Đen/Trắng'], ['Đỏ/Cam']],
+    footType: 'unisex',
+    material: 'Engineered Mesh',
+    sole: 'Foam cushioning',
+    query: 'running shoes product'
+  },
+  'giay-bong-ro': {
+    nameTemplates: ['LeBron XXI', 'Harden Vol 7', 'Curry 11', 'Dame 8', 'Air Jordan 1'],
+    priceRange: [2500000, 5500000],
+    sizes: ['40', '41', '42', '43', '44', '45'],
+    colors: [['Đen/Vàng'], ['Đỏ/Bạc'], ['Trắng/Xanh']],
+    footType: 'be',
+    material: 'Knit/Mesh',
+    sole: 'Cushion rubber',
+    query: 'basketball shoes product'
+  },
+  'giay-tennis': {
+    nameTemplates: ['Court Zoom Vapor Pro', 'Barricade 12', 'Gel Resolution 9', 'Rush Pro 4.0'],
+    priceRange: [2000000, 3800000],
+    sizes: ['38', '39', '40', '41', '42', '43'],
+    colors: [['Trắng/Đen'], ['Xanh/Trắng']],
+    footType: 'thon',
+    material: 'Synthetic Mesh',
+    sole: 'Durable rubber',
+    query: 'tennis shoes product'
+  },
+  'giay-bong-da': {
+    nameTemplates: ['Vapor 15 Academy FG', 'Copa Sense TF', 'Morelia Neo FG', 'Future Ultimate TF'],
+    priceRange: [1500000, 3500000],
+    sizes: ['38', '39', '40', '41', '42', '43'],
+    colors: [['Đen'], ['Trắng/Cam']],
+    footType: 'unisex',
+    material: 'Synthetic',
+    sole: 'Multi-ground',
+    query: 'football cleats'
+  },
+  'qua-bong-da': {
+    nameTemplates: ['Strike Football', 'UCL Match Ball', 'La Liga Pitch', 'Kamito Lapa', 'Zocker Empire'],
+    priceRange: [300000, 1500000],
+    sizes: ['Size 4', 'Size 5'],
+    colors: [['Trắng/Đen/Đỏ'], ['Trắng/Xanh'], ['Vàng/Đen']],
+    footType: 'unisex',
+    material: 'PU/PVC leather',
+    sole: 'Butyl bladder',
+    query: 'soccer ball'
+  },
+  'boc-ong-dong': {
+    nameTemplates: ['Guard Shin Guards', 'Predator Pro Shin Guards', 'Mercurial Lite', 'Kamito Protect'],
+    priceRange: [150000, 500000],
+    sizes: ['S', 'M', 'L'],
+    colors: [['Đen'], ['Trắng'], ['Xanh']],
+    footType: 'unisex',
+    material: 'PP shell + EVA foam',
+    sole: 'None',
+    query: 'shin guards'
+  },
+  'gang-tay-thu-mon': {
+    nameTemplates: ['Predator Pro Gloves', 'Vapor Grip 3', 'Future Grip 1', 'Mizuno Gate Sky'],
+    priceRange: [500000, 2500000],
+    sizes: ['Size 7', 'Size 8', 'Size 9', 'Size 10'],
+    colors: [['Đen/Đỏ'], ['Xanh/Trắng']],
+    footType: 'unisex',
+    material: 'Latex foam',
+    sole: 'None',
+    query: 'goalkeeper gloves'
+  },
+  'vo-bong-da': {
+    nameTemplates: ['Classic Socks', 'Grip Socks Anti-Slip', 'Mercurial Crew', 'Adidas Cushioned Socks'],
+    priceRange: [50000, 250000],
+    sizes: ['M (35-39)', 'L (40-45)'],
+    colors: [['Trắng'], ['Đen'], ['Đỏ'], ['Xanh']],
+    footType: 'unisex',
+    material: 'Polyester/Cotton/Spandex',
+    sole: 'None',
+    query: 'soccer socks'
+  },
+  'ao-bong-da-chinh-hang': {
+    nameTemplates: ['Manchester United Home Jersey', 'Real Madrid Away Jersey', 'Arsenal Third Jersey', 'Vietnam National Team Kit'],
+    priceRange: [350000, 1800000],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    colors: [['Đỏ'], ['Trắng'], ['Xanh navy'], ['Vàng']],
+    footType: 'unisex',
+    material: '100% Recycled Polyester',
+    sole: 'None',
+    query: 'soccer jersey'
+  },
+  'phu-kien-ra-san': {
+    nameTemplates: ['Sport Water Bottle 1L', 'Training Cones Set of 10', 'Captain Armband', 'Sweat Headband'],
+    priceRange: [80000, 300000],
+    sizes: ['Standard'],
+    colors: [['Đen'], ['Đỏ'], ['Xanh']],
+    footType: 'unisex',
+    material: 'Plastic/Fabric',
+    sole: 'None',
+    query: 'sports accessory'
+  },
+  'balo-tui-xach': {
+    nameTemplates: ['Academy Gym Bag', 'Classic Backpack 25L', 'Predator Duffle Bag', 'Kamito Sports Pack'],
+    priceRange: [400000, 1200000],
+    sizes: ['20L', '30L', '40L'],
+    colors: [['Đen'], ['Xanh navy'], ['Xám']],
+    footType: 'unisex',
+    material: 'Polyester waterproof',
+    sole: 'None',
+    query: 'sports backpack'
+  },
+  'bo-quan-ao-bong-da': {
+    nameTemplates: ['Entrada Football Kit', 'Veloce Match Uniform', 'Strike Training Suit', 'Zocker Pro Kit'],
+    priceRange: [250000, 900000],
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: [['Xanh dương'], ['Đỏ/Đen'], ['Trắng/Xanh lá']],
+    footType: 'unisex',
+    material: 'Breathable polyester',
+    sole: 'None',
+    query: 'football uniform'
+  },
+  'dep-chinh-hang': {
+    nameTemplates: ['Benassi Slides', 'Adilette Shower Slides', 'Puma Cool Cat Slides', 'Under Armour Ansa'],
+    priceRange: [350000, 1200000],
+    sizes: ['38', '39', '40', '41', '42', '43'],
+    colors: [['Đen/Trắng'], ['Trắng'], ['Navy']],
+    footType: 'unisex',
+    material: 'EVA foam',
+    sole: 'EVA sole',
+    query: 'slides sandals'
+  }
+};
+
+let generatedCount = PRODUCTS_TEMPLATE.length;
+let categoryKeys = Object.keys(categorySpecs);
+let brandIndex = 0;
+let categoryIndex = 0;
+
+while (generatedCount < 200) {
+  const catKey = categoryKeys[categoryIndex % categoryKeys.length];
+  const spec = categorySpecs[catKey];
+  const brand = brandsList[brandIndex % brandsList.length];
+  
+  const baseName = spec.nameTemplates[Math.floor(Math.random() * spec.nameTemplates.length)];
+  const name = `${brand} ${baseName} ${generatedCount}`;
+  
+  const minPrice = spec.priceRange[0];
+  const maxPrice = spec.priceRange[1];
+  const originalPrice = Math.floor((minPrice + Math.random() * (maxPrice - minPrice)) / 10000) * 10000;
+  const price = Math.floor((originalPrice * (0.8 + Math.random() * 0.2)) / 10000) * 10000;
+  
+  const colors = spec.colors[Math.floor(Math.random() * spec.colors.length)];
+  
+  PRODUCTS_TEMPLATE.push({
+    name,
+    brand,
+    category: catKey,
+    originalPrice,
+    price,
+    gender: Math.random() < 0.2 ? 'nu' : (Math.random() < 0.8 ? 'nam' : 'unisex'),
+    sizes: spec.sizes,
+    colors,
+    stock: Math.floor(20 + Math.random() * 100),
+    sold: Math.floor(5 + Math.random() * 200),
+    rating: Number((4.0 + Math.random() * 1.0).toFixed(1)),
+    reviews: Math.floor(3 + Math.random() * 80),
+    weight: Math.random() < 0.5 ? Math.floor(200 + Math.random() * 200) : null,
+    footType: spec.footType || 'unisex',
+    material: spec.material,
+    sole: spec.sole,
+    tags: [brand.toLowerCase(), catKey.replace('giay-', ''), 'chính hãng'],
+    isFeatured: Math.random() < 0.2,
+    isNewArrival: Math.random() < 0.3,
+    unsplashQuery: `${brand} ${spec.query}`
+  });
+  
+  generatedCount++;
+  brandIndex++;
+  categoryIndex++;
+}
+
 // ============================================================
 // MAIN SEEDER
 // ============================================================
@@ -377,10 +633,23 @@ async function seed() {
   for (const c of CATEGORIES_DATA) {
     try {
       const existing = await Category.findOne({ where: { slug: c.slug } });
+      
+      let imageUrl = c.imageUrl;
+      if (!imageUrl) {
+        const query = CATEGORY_QUERIES[c.slug];
+        if (query) {
+          const imgs = await getPexelsImages(query, 1);
+          if (imgs && imgs[0]) imageUrl = imgs[0];
+        }
+      }
+      if (!imageUrl) {
+        imageUrl = pickCategoryImage(c.slug);
+      }
+
       if (existing) {
-        await existing.update({ image_url: c.imageUrl || pickCategoryImage(c.slug) });
+        await existing.update({ image_url: imageUrl });
         categoryMap[c.slug] = existing.id;
-        console.log(`  🔄 Category "${c.name}" cập nhật ảnh giày (id=${existing.id})`);
+        console.log(`  🔄 Category "${c.name}" cập nhật ảnh (id=${existing.id})`);
         continue;
       }
 
@@ -388,7 +657,7 @@ async function seed() {
         name: c.name,
         slug: c.slug,
         description: c.description,
-        image_url: c.imageUrl || pickCategoryImage(c.slug),
+        image_url: imageUrl,
         type: c.type,
         is_active: true,
       });
@@ -416,14 +685,22 @@ async function seed() {
 
       const slug = slugify(p.name) + '-' + Date.now().toString().slice(-5);
       const existing = await Product.findOne({ where: { name: p.name } });
+      
+      let images = pickProductImages(p.category, p.name, 4);
+      if (images && images.length > 1 && images[0] === images[1]) {
+        const query = p.unsplashQuery || p.name;
+        const pexelsImgs = await getPexelsImages(query, 4);
+        if (pexelsImgs && pexelsImgs.length > 0) {
+          images = pexelsImgs;
+        }
+      }
+
       if (existing) {
-        await existing.update({ images: pickProductImages(p.category, p.name, 4) });
-        console.log(`  🔄 "${p.name}" cập nhật ảnh giày`);
+        await existing.update({ images });
+        console.log(`  🔄 "${p.name}" cập nhật ảnh`);
         skipped++;
         continue;
       }
-
-      const images = pickProductImages(p.category, p.name, 4);
 
       await Product.create({
         name: p.name,
