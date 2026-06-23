@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { fetchApi } from "../utils/api";
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/Pagination";
 
 export default function BrandProductsPage() {
   const { brandSlug } = useParams();
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [brand, setBrand] = useState(null);
@@ -21,7 +23,8 @@ export default function BrandProductsPage() {
       setLoading(true);
       try {
         // Lấy thông tin brand
-        const brandsData = await fetchApi("/brands");
+        const brandsResponse = await fetchApi("/brands");
+        const brandsData = brandsResponse?.data || brandsResponse || [];
         const foundBrand = brandsData.find(
           (b) => b.slug === brandSlug || b.slug.includes(brandSlug)
         );
@@ -30,9 +33,9 @@ export default function BrandProductsPage() {
           setBrand(foundBrand);
 
           // Lấy sản phẩm của brand này
-          const response = await fetchApi(
-            `/products?brand=${foundBrand._id}&page=${currentPage}&limit=${PRODUCTS_PER_PAGE}`
-          );
+          let url = `/products?brand=${foundBrand._id}&page=${currentPage}&limit=${PRODUCTS_PER_PAGE}`;
+          if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
+          const response = await fetchApi(url);
 
           const formattedProducts = response.data.map((p) => ({
             id: p._id,
@@ -83,7 +86,7 @@ export default function BrandProductsPage() {
       {brand ? (
         <>
           <h1 className="text-3xl font-bold text-center mb-4">
-            Sản phẩm {brand.name}
+            Sản phẩm {brand.name}{searchQuery ? ` - ${searchQuery}` : ""}
           </h1>
           <p className="text-center text-gray-600 mb-8">
             Tìm thấy {total} sản phẩm
