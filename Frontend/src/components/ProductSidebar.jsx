@@ -31,15 +31,17 @@ export default function ProductSidebar({ activeFilters, onFilterChange }) {
   // Fetch Categories và Brands
   const fetchData = useCallback(async () => {
     try {
-      // Fetch Categories
+      // Fetch Categories (chỉ lấy type standard)
       const catsResponse = await fetchApi("/categories");
       const fetchedCategories = catsResponse?.data || catsResponse || [];
       setCategories(
-        fetchedCategories.map((c) => ({
-          name: c.name,
-          slug: c.slug,
-          id: c._id, // Quan trọng: dùng ID cho filtering
-        }))
+        fetchedCategories
+          .filter((c) => c.type === "standard" || c.type == null)
+          .map((c) => ({
+            name: c.name,
+            slug: c.slug,
+            id: c.id,
+          }))
       );
 
       // Fetch Brands
@@ -49,7 +51,7 @@ export default function ProductSidebar({ activeFilters, onFilterChange }) {
         fetchedBrands.map((b) => ({
           name: b.name,
           slug: b.slug,
-          id: b._id, // Quan trọng: dùng ID cho filtering
+          id: b.id,
         }))
       );
     } catch (error) {
@@ -106,7 +108,28 @@ export default function ProductSidebar({ activeFilters, onFilterChange }) {
         ))}
       </FilterGroup>
 
-      {/* 2. Lọc theo giá (Dùng logic getPriceQuery trên ProductListPage) */}
+      {/* 2. Lọc theo hình dạng bàn chân 👟 */}
+      <FilterGroup title="👟 Hình dạng bàn chân">
+        {[
+          { value: "be", label: "Chân bè (Wide Fit)", emoji: "🦶" },
+          { value: "thon", label: "Chân thon (Slim Fit)", emoji: "👠" },
+        ].map((item) => (
+          <label
+            key={item.value}
+            className="flex items-center gap-2 text-sm cursor-pointer hover:text-primary transition-colors duration-200 py-1"
+          >
+            <input
+              type="checkbox"
+              className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary focus:ring-2 cursor-pointer"
+              checked={activeFilters.footTypes?.includes(item.value) || false}
+              onChange={() => onFilterChange("footTypes", item.value)}
+            />
+            <span>{item.emoji} {item.label}</span>
+          </label>
+        ))}
+      </FilterGroup>
+
+      {/* 3. Lọc theo giá */}
       <FilterGroup title="Giá">
         {priceRanges.map((range) => (
           <label 
@@ -124,7 +147,7 @@ export default function ProductSidebar({ activeFilters, onFilterChange }) {
         ))}
       </FilterGroup>
 
-      {/* 3. Lọc theo thương hiệu (SỬ DỤNG ID TỪ API) */}
+      {/* 4. Lọc theo thương hiệu */}
       <FilterGroup title="Thương hiệu">
         {brands.length === 0 ? (
           <p className="text-sm text-gray-400 italic">Không có thương hiệu</p>
