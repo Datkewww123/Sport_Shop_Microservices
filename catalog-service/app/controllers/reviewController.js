@@ -1,45 +1,24 @@
-const Review = require('../models/Review');
-const Product = require('../models/Product');
+const { getReview, getProduct } = require('../models');
+const { Op } = require('sequelize');
 
 exports.createReview = async (req, res) => {
   try {
+    const Review = getReview();
+    const Product = getProduct();
     const { productId, rating, title, comment, images } = req.body;
+    if (!productId || !rating || !comment) return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
 
-    if (!productId || !rating || !comment) {
-      return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
-    }
+    const existing = await Review.findOne({ where: { user_id: req.user.id, product_id: productId } });
+    if (existing) return res.status(400).json({ error: 'Bạn đã đánh giá sản phẩm này rồi' });
 
-    const existingReview = await Review.findOne({
-      user: req.user.id,
-      product: productId
+    const product = await Product.findByPk(productId);
+    if (!product) return res.status(404).json({ error: 'Sản phẩm không tồn tại' });
+
+    const review = await Review.create({
+      user_id: req.user.id, product_id: productId,
+      rating, title, comment, images: images || [], status: 'pending'
     });
-
-    if (existingReview) {
-      return res.status(400).json({ error: 'Bạn đã đánh giá sản phẩm này rồi' });
-    }
-
-    const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).json({ error: 'Sản phẩm không tồn tại' });
-    }
-
-    const review = new Review({
-      user: req.user.id,
-      product: productId,
-      rating,
-      title,
-      comment,
-      images: images || [],
-      status: 'pending'
-    });
-
-    await review.save();
-
-    res.status(201).json({
-      success: true,
-      message: 'Đánh giá của bạn đã được gửi và đang chờ duyệt',
-      review
-    });
+    res.status(201).json({ success: true, message: 'Đánh giá đang chờ duyệt', review });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -47,49 +26,18 @@ exports.createReview = async (req, res) => {
 
 exports.getProductReviews = async (req, res) => {
   try {
+    const Review = getReview();
     const { productId } = req.params;
-    const { page = 1, limit = 10, rating, sort = '-createdAt' } = req.query;
-    const skip = (Number(page) - 1) * Number(limit);
+    const { page = 1, limit = 10, rating } = req.query;
+    const offset = (Number(page) - 1) * Number(limit);
+    const where = { product_id: productId, status: 'approved' };
+    if (rating) where.rating = Number(rating);
 
-    const filter = {
-      product: productId,
-      status: 'approved'
-    };
-
-    if (rating) {
-      filter.rating = Number(rating);
-    }
-
-    const reviews = await Review.find(filter)
-      .sort(sort)
-      .skip(skip)
-      .limit(Number(limit));
-
-    const total = await Review.countDocuments(filter);
-    const totalPages = Math.ceil(total / limit);
-
-    const ratingStats = await Review.aggregate([
-      { $match: { product: productId, status: 'approved' } },
-      {
-        $group: {
-          _id: '$rating',
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { _id: -1 } }
-    ]);
-
-    res.json({
-      success: true,
-      reviews,
-      pagination: {
-        currentPage: Number(page),
-        totalPages,
-        total,
-        limit: Number(limit)
-      },
-      ratingStats
+    const { count, rows: reviews } = await Review.findAndCountAll({
+      where, order: [['created_at', 'DESC']],
+      limit: Number(limit), offset
     });
+    res.json({ success: true, reviews, pagination: { currentPage: Number(page), totalPages: Math.ceil(count / limit), total: count } });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -97,27 +45,16 @@ exports.getProductReviews = async (req, res) => {
 
 exports.getMyReviews = async (req, res) => {
   try {
+    const Review = getReview();
+    const Product = getProduct();
     const { page = 1, limit = 10 } = req.query;
-    const skip = (Number(page) - 1) * Number(limit);
-
-    const reviews = await Review.find({ user: req.user.id })
-      .populate('product', 'name images price')
-      .sort('-createdAt')
-      .skip(skip)
-      .limit(Number(limit));
-
-    const total = await Review.countDocuments({ user: req.user.id });
-
-    res.json({
-      success: true,
-      reviews,
-      pagination: {
-        currentPage: Number(page),
-        totalPages: Math.ceil(total / limit),
-        total,
-        limit: Number(limit)
-      }
+    const offset = (Number(page) - 1) * Number(limit);
+    const { count, rows: reviews } = await Review.findAndCountAll({
+      where: { user_id: req.user.id },
+      include: [{ model: Product, attributes: ['name', 'images', 'price'] }],
+      order: [['created_at', 'DESC']], limit: Number(limit), offset
     });
+    res.json({ success: true, reviews, pagination: { currentPage: Number(page), totalPages: Math.ceil(count / limit), total: count } });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -125,23 +62,11 @@ exports.getMyReviews = async (req, res) => {
 
 exports.approveReview = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const review = await Review.findByIdAndUpdate(
-      id,
-      { status: 'approved' },
-      { new: true }
-    );
-
-    if (!review) {
-      return res.status(404).json({ error: 'Review không tồn tại' });
-    }
-
-    res.json({
-      success: true,
-      message: 'Đã duyệt review',
-      review
-    });
+    const Review = getReview();
+    const review = await Review.findByPk(req.params.id);
+    if (!review) return res.status(404).json({ error: 'Review không tồn tại' });
+    await review.update({ status: 'approved' });
+    res.json({ success: true, message: 'Đã duyệt review', review });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -149,23 +74,11 @@ exports.approveReview = async (req, res) => {
 
 exports.rejectReview = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const review = await Review.findByIdAndUpdate(
-      id,
-      { status: 'rejected' },
-      { new: true }
-    );
-
-    if (!review) {
-      return res.status(404).json({ error: 'Review không tồn tại' });
-    }
-
-    res.json({
-      success: true,
-      message: 'Đã từ chối review',
-      review
-    });
+    const Review = getReview();
+    const review = await Review.findByPk(req.params.id);
+    if (!review) return res.status(404).json({ error: 'Review không tồn tại' });
+    await review.update({ status: 'rejected' });
+    res.json({ success: true, message: 'Đã từ chối review', review });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -173,27 +86,11 @@ exports.rejectReview = async (req, res) => {
 
 exports.replyReview = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { reply } = req.body;
-
-    const review = await Review.findByIdAndUpdate(
-      id,
-      {
-        adminReply: reply,
-        adminRepliedAt: new Date()
-      },
-      { new: true }
-    );
-
-    if (!review) {
-      return res.status(404).json({ error: 'Review không tồn tại' });
-    }
-
-    res.json({
-      success: true,
-      message: 'Đã trả lời review',
-      review
-    });
+    const Review = getReview();
+    const review = await Review.findByPk(req.params.id);
+    if (!review) return res.status(404).json({ error: 'Review không tồn tại' });
+    await review.update({ admin_reply: req.body.reply, admin_replied_at: new Date() });
+    res.json({ success: true, message: 'Đã trả lời review', review });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -201,24 +98,14 @@ exports.replyReview = async (req, res) => {
 
 exports.deleteReview = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const review = await Review.findById(id);
-
-    if (!review) {
-      return res.status(404).json({ error: 'Review không tồn tại' });
-    }
-
-    if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    const Review = getReview();
+    const review = await Review.findByPk(req.params.id);
+    if (!review) return res.status(404).json({ error: 'Review không tồn tại' });
+    if (review.user_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Không có quyền xóa review này' });
     }
-
-    await Review.findByIdAndDelete(id);
-
-    res.json({
-      success: true,
-      message: 'Đã xóa review'
-    });
+    await review.destroy();
+    res.json({ success: true, message: 'Đã xóa review' });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
