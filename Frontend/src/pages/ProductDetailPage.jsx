@@ -139,7 +139,7 @@ export default function ProductDetailPage() {
         <div className="md:col-span-1">
           <h1 className="text-3xl font-bold mb-4 dark:text-white">{product.name}</h1>
           <p className="text-3xl font-bold text-red-600 mb-6">
-            {product.price ? product.price.toLocaleString("vi-VN") : "0"} ₫
+            {product.price ? Number(product.price).toLocaleString("vi-VN") : "0"} ₫
           </p>
 
           {/* LỰA CHỌN SIZE */}

@@ -23,7 +23,7 @@ function SkeletonCard() {
 function SuggestionCard({ product }) {
   const { addToCart } = useCart();
 
-  const price = product?.price ?? product?.salePrice ?? 0;
+  const price = Number(product?.price ?? product?.salePrice ?? 0);
   const name = product?.name ?? "Sản phẩm";
   const image =
     product?.images?.[0]?.url ||
@@ -382,7 +382,7 @@ export default function CartPage() {
                     <span className="text-xs text-green-600 dark:text-green-400">
                       ({couponInfo.discountType === "percentage"
                         ? `${couponInfo.discount}%`
-                        : `${couponInfo.discountValue.toLocaleString("vi-VN")} đ`})
+                        : `${Number(couponInfo.discountValue).toLocaleString("vi-VN")} đ`})
                     </span>
                   </div>
                   <button

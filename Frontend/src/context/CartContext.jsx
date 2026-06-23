@@ -212,7 +212,7 @@ export function CartProvider({ children }) {
                   Số lượng: <span className="font-semibold text-gray-700 dark:text-slate-300">{modalData.quantity}</span>
                 </p>
                 <div className="mt-2 text-sm font-bold text-primary">
-                  {modalData.product.price ? modalData.product.price.toLocaleString("vi-VN") : "0"} ₫
+                  {modalData.product.price ? Number(modalData.product.price).toLocaleString("vi-VN") : "0"} ₫
                 </div>
               </div>
             </div>
