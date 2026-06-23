@@ -55,7 +55,7 @@ export default function CartItem({ item }) {
       {/* 2. Đơn giá (chiếm 2/12 cột) */}
       <div className="lg:col-span-2 lg:text-center text-sm text-gray-700 dark:text-slate-300">
         <span className="lg:hidden font-bold">Đơn giá: </span>
-        {item.price ? item.price.toLocaleString("vi-VN") : "0"} đ
+        {item.price ? Number(item.price).toLocaleString("vi-VN") : "0"} đ
       </div>
 
       {/* 3. Số lượng (chiếm 2/12 cột) */}

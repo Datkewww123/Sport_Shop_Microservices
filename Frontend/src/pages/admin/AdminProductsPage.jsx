@@ -12,7 +12,7 @@ const ProductFormModal = ({ product, categories, brands, onClose, onSave }) => {
   const isEditing = !!product;
   const [formData, setFormData] = useState({
     name: product?.name || "",
-    price: product?.price || 0,
+    price: product?.price ? Number(product.price) : 0,
     description: product?.description || "",
     category: product?.category?.id || product?.category_id || (categories[0]?.id || ""),
     brand: product?.brand?.id || product?.brand_id || (brands[0]?.id || ""),

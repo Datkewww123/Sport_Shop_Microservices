@@ -232,7 +232,7 @@ export default function OrderHistoryPage() {
                   <div className="flex justify-between">
                     <span className="text-gray-500 text-sm">Tổng tiền:</span>
                     <span className="font-bold text-red-600">
-                      {order.total ? order.total.toLocaleString("vi-VN") : "0"} ₫
+                      {order.total ? Number(order.total).toLocaleString("vi-VN") : "0"} ₫
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">

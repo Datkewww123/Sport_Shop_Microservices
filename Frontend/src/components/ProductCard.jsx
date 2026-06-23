@@ -52,20 +52,20 @@ export default function ProductCard({ product }) {
 
         {/* Giá - Chiều cao cố định h-12 flex-col để căn đều kể cả khi có giảm giá hoặc không */}
         <div className="mb-4 h-12 flex flex-col justify-end">
-          {product.originalPrice && product.originalPrice > product.price ? (
+          {product.originalPrice && Number(product.originalPrice) > Number(product.price) ? (
             <>
               <p className="text-xs text-gray-400 line-through leading-none mb-1">
-                {product.originalPrice.toLocaleString("vi-VN")} đ
+                {Number(product.originalPrice).toLocaleString("vi-VN")} đ
               </p>
               <p className="text-base font-bold text-primary leading-none">
-                {product.price ? product.price.toLocaleString("vi-VN") : "0"} đ
+                {product.price ? Number(product.price).toLocaleString("vi-VN") : "0"} đ
               </p>
             </>
           ) : (
             <>
               <div className="h-3" /> {/* Khoảng trống bù chiều cao cho giá gốc */}
               <p className="text-base font-bold text-primary leading-none">
-                {product.price ? product.price.toLocaleString("vi-VN") : "0"} đ
+                {product.price ? Number(product.price).toLocaleString("vi-VN") : "0"} đ
               </p>
             </>
           )}

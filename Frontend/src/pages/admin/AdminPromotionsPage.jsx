@@ -200,7 +200,7 @@ export default function AdminPromotionsPage() {
                     <div className="text-sm text-gray-900">
                       {promo.discountType === "percentage"
                         ? `${promo.discount}%`
-                        : `${promo.discount.toLocaleString()}đ`}
+                        : `${Number(promo.discount).toLocaleString("vi-VN")} đ`}
                     </div>
                   </td>
                   <td className="px-6 py-4">

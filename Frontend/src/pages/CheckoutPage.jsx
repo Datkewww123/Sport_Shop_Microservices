@@ -543,7 +543,7 @@ export default function CheckoutPage() {
                   <i className="fas fa-check-circle text-green-500" />
                   <span className="font-semibold text-green-700">{couponInfo.code}</span>
                   <span className="text-sm text-green-600">
-                    (-{couponInfo.discountValue?.toLocaleString("vi-VN")} ₫)
+                    (-{couponInfo.discountValue ? Number(couponInfo.discountValue).toLocaleString("vi-VN") : "0"} ₫)
                   </span>
                 </div>
                 <span className="text-xs text-green-500">Đã áp dụng</span>
@@ -563,7 +563,7 @@ export default function CheckoutPage() {
             {couponInfo && (
               <div className="flex justify-between text-green-600">
                 <span>Giảm giá:</span>
-                <span>-{couponInfo.discountValue?.toLocaleString("vi-VN")} ₫</span>
+                <span>-{couponInfo.discountValue ? Number(couponInfo.discountValue).toLocaleString("vi-VN") : "0"} ₫</span>
               </div>
             )}
             <div className="flex justify-between text-gray-700">
