@@ -65,7 +65,8 @@ export async function fetchApi(endpoint, options = {}) {
     return null; // Trả về null để tránh lỗi parse JSON trên body rỗng
   }
 
-  const data = await response.json();
+  const rawData = await response.json();
+  const data = mapIdToUnderscoreId(rawData);
   
   // Backend có 2 format:
   // 1. New format (với ResponseHelper): { success: true, statusCode: 200, message: "...", data: {...} }
@@ -83,6 +84,25 @@ export async function fetchApi(endpoint, options = {}) {
       data: data
     };
   }
+}
+
+function mapIdToUnderscoreId(obj) {
+  if (obj === null || obj === undefined) return obj;
+  if (Array.isArray(obj)) {
+    return obj.map(mapIdToUnderscoreId);
+  }
+  if (typeof obj === 'object') {
+    const mapped = {};
+    for (const key in obj) {
+      mapped[key] = mapIdToUnderscoreId(obj[key]);
+    }
+    // If 'id' exists and '_id' is missing, set '_id' to 'id'
+    if ('id' in mapped && !('_id' in mapped)) {
+      mapped._id = mapped.id;
+    }
+    return mapped;
+  }
+  return obj;
 }
 
 export function buildQueryParams(params) {
