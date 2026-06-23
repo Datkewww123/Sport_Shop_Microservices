@@ -118,6 +118,7 @@ const LineChart = ({ title, data, color, yAxisFormatter }) => {
             {/* Data Points */}
             {points.map((p, i) => (
               <g key={i} className="group/point">
+                <title>{p.label}: {yAxisFormatter ? yAxisFormatter(p.value) : p.value}</title>
                 <circle 
                   cx={p.x} 
                   cy={p.y} 
@@ -235,6 +236,7 @@ const BarChart = ({ title, data, color, yAxisFormatter }) => {
               
               return (
                 <g key={i} className="group/bar">
+                  <title>{d.label}: {yAxisFormatter ? yAxisFormatter(d.value) : d.value}</title>
                   <rect 
                     x={x} 
                     y={y} 
@@ -258,7 +260,7 @@ const BarChart = ({ title, data, color, yAxisFormatter }) => {
                     textAnchor="middle" 
                     className="fill-gray-400 dark:fill-slate-500 text-[9px] font-medium font-sans"
                   >
-                    {d.label.length > 9 ? `${d.label.slice(0, 9)}..` : d.label}
+                    {d.label.length > 15 ? `${d.label.slice(0, 15)}...` : d.label}
                   </text>
                 </g>
               );
@@ -493,14 +495,14 @@ export default function AdminDashboardPage() {
         />
 
         {/* Biểu đồ 2: Sản phẩm bán chạy nhất */}
-        <LineChart
+        <BarChart
           title="Sản phẩm bán chạy nhất (Số lượng)"
           data={stats.bestSellers}
           color="#3b82f6"
         />
 
         {/* Biểu đồ 3: Sản phẩm tồn kho nhiều nhất */}
-        <LineChart
+        <BarChart
           title="Sản phẩm tồn kho nhiều nhất (Số lượng)"
           data={stats.mostStockedProducts}
           color="#f59e0b"
@@ -530,12 +532,12 @@ export default function AdminDashboardPage() {
           {stats.recentOrders && stats.recentOrders.length > 0 ? (
             stats.recentOrders.map((order) => (
               <div
-                key={order._id}
+                key={order.id}
                 className="flex justify-between items-center p-4 bg-gray-50/50 dark:bg-slate-900/40 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-900/60 transition-all border border-transparent hover:border-gray-100 dark:hover:border-slate-800"
               >
                 <div className="text-sm">
                   <p className="font-bold text-gray-800 dark:text-white">
-                    {order.orderCode || (order._id ? `#${String(order._id).slice(-6).toUpperCase()}` : 'N/A')}
+                    {order.orderCode || (order.id ? `#${String(order.id).slice(-6).toUpperCase()}` : 'N/A')}
                   </p>
                   <p className="text-gray-400 text-xs mt-1">
                     Khách hàng: <span className="text-gray-600 dark:text-slate-300 font-medium">{order.user?.name || 'N/A'}</span>
