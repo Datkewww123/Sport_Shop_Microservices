@@ -57,6 +57,7 @@ export default function ProductListPage() {
   const [activeFilters, setActiveFilters] = useState({
     brands: [],
     prices: [],
+    footTypes: [],
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -105,15 +106,19 @@ export default function ProductListPage() {
     }
 
     // Xây dựng Query Params
+    // Nếu footTypes có 1 lựa chọn -> gửi lên. Nếu có 2 (hoặc 0) -> không filter (hiện tất cả)
+    const footTypeParam =
+      activeFilters.footTypes.length === 1 ? activeFilters.footTypes[0] : undefined;
+
     const params = {
       page: currentPage,
       limit: PRODUCTS_PER_PAGE,
-      category: categoryInfo.categoryId || undefined, // Truyền category ID nếu có
-      brand: brandFilter.length > 0 ? brandFilter : undefined, // Backend có thể nhận mảng
+      category: categoryInfo.categoryId || undefined,
+      brand: brandFilter.length > 0 ? brandFilter : undefined,
       minPrice: minPrice || undefined,
       maxPrice: maxPrice || undefined,
       sort: SORT_MAPPING[sortOrder] || SORT_MAPPING["Sản phẩm nổi bật"],
-      // search: // Thêm search query nếu có
+      footType: footTypeParam,
     };
 
     const queryString = buildQueryParams(params);
@@ -135,11 +140,11 @@ export default function ProductListPage() {
 
       // Chuyển đổi dữ liệu từ Backend sang Frontend format
       const products = productsData.map((p) => ({
-        id: p._id,
+        id: p.id || p._id,
         slug: p.slug,
         name: p.name,
         price: p.price,
-        originalPrice: p.originalPrice,
+        originalPrice: p.original_price || p.originalPrice,
         brand: p.brand?.name,
         stock: p.stock || 0,
         sold: p.sold || 0,
@@ -178,7 +183,7 @@ export default function ProductListPage() {
     } finally {
       setLoading(false);
     }
-  }, [categoryId, currentPage, sortOrder, activeFilters, fetchCategoryData, brandFromUrl]);
+  }, [categoryId, currentPage, sortOrder, activeFilters, fetchCategoryData, brandFromUrl]); // eslint-disable-line
 
   useEffect(() => {
     fetchProducts();
