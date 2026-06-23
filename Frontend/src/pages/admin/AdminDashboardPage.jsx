@@ -535,7 +535,7 @@ export default function AdminDashboardPage() {
               >
                 <div className="text-sm">
                   <p className="font-bold text-gray-800 dark:text-white">
-                    {order.orderCode || `#${order._id.slice(-6).toUpperCase()}`}
+                    {order.orderCode || (order._id ? `#${String(order._id).slice(-6).toUpperCase()}` : 'N/A')}
                   </p>
                   <p className="text-gray-400 text-xs mt-1">
                     Khách hàng: <span className="text-gray-600 dark:text-slate-300 font-medium">{order.user?.name || 'N/A'}</span>
