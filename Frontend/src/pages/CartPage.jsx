@@ -27,6 +27,7 @@ function SuggestionCard({ product }) {
   const name = product?.name ?? "Sản phẩm";
   const image =
     product?.images?.[0]?.url ||
+    product?.images?.[0] ||
     product?.image ||
     product?.thumbnail ||
     "https://placehold.co/400x400?text=Giay";
