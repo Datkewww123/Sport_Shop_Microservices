@@ -283,13 +283,14 @@ export default function AdminProductsPage() {
         limit: PRODUCTS_PER_PAGE,
         showAll: "true",
       }).toString();
-      const productResponse = await fetchApi(`/products?${query}`);
-      const data = productResponse.data || productResponse;
-      setProducts(data.products || []);
+      const response = await fetchApi(`/products?${query}`);
+      const productsData = response.data || [];
+      const paginationData = response.pagination || { currentPage: 1, totalPages: 1, total: 0 };
+      setProducts(productsData);
       setPagination({
-        currentPage: data.pagination?.page || 1,
-        totalPages: data.pagination?.pages || 1,
-        total: data.pagination?.total || 0,
+        currentPage: paginationData.currentPage || 1,
+        totalPages: paginationData.totalPages || 1,
+        total: paginationData.total || 0,
       });
     } catch (error) {
       toast.error("Không thể tải danh sách sản phẩm.");

@@ -204,6 +204,45 @@ async function getPexelsImagesWithDeduplication(query, count = 1) {
   }
 }
 
+async function getUniquePexelsImagesForPool(query, count = 25) {
+  try {
+    await sleep(300); // rate limit
+    // Request up to 40 photos to have enough unique ones
+    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=40`;
+    const response = await httpGetPexels(url);
+    if (!response || !Array.isArray(response.photos)) return getPlaceholderImages(query, count);
+    
+    const selectedUrls = [];
+    for (const photo of response.photos) {
+      const imgUrl = photo.src?.large || photo.src?.medium;
+      if (imgUrl && !usedImageUrls.has(imgUrl)) {
+        usedImageUrls.add(imgUrl);
+        selectedUrls.push(imgUrl);
+        if (selectedUrls.length === count) break;
+      }
+    }
+    
+    // If we don't have enough unique ones, grab already used ones or placeholder
+    if (selectedUrls.length < count) {
+      for (const photo of response.photos) {
+        const imgUrl = photo.src?.large || photo.src?.medium;
+        if (imgUrl && !selectedUrls.includes(imgUrl)) {
+          selectedUrls.push(imgUrl);
+          if (selectedUrls.length === count) break;
+        }
+      }
+    }
+    
+    while (selectedUrls.length < count) {
+      selectedUrls.push(getPlaceholderImages(query, 1)[0]);
+    }
+    return selectedUrls;
+  } catch (err) {
+    console.warn(`  ⚠️ Pexels pool fallback for "${query}": ${err.message}`);
+    return getPlaceholderImages(query, count);
+  }
+}
+
 const CATEGORY_QUERIES = {
   'giay-bong-da-san-co-tu-nhien': 'soccer cleats grass shoe -people',
   'giay-bong-da-san-co-nhan-tao': 'soccer turf shoes -people',
@@ -670,6 +709,30 @@ async function seed() {
 
   // ── 3. PRODUCTS ────────────────────────────────────────────
   console.log('\n278: 👟 Seeding products...');
+
+  // Pre-fetch unique image pools for categories to prevent duplicates
+  const categoryImagePools = {};
+  const categoryIndexMap = {};
+  
+  console.log('\n📸 Pre-fetching Pexels image pools for categories...');
+  const uniqueCategorySlugs = [...new Set(PRODUCTS_TEMPLATE.map(p => p.category))];
+  
+  for (const catSlug of uniqueCategorySlugs) {
+    const query = CATEGORY_QUERIES[catSlug] || `${catSlug.replace('-', ' ')} product -people`;
+    console.log(`Fetching image pool for category "${catSlug}" with query "${query}"...`);
+    
+    try {
+      const photos = await getUniquePexelsImagesForPool(query, 25);
+      categoryImagePools[catSlug] = photos;
+      categoryIndexMap[catSlug] = 0;
+      console.log(`  -> Obtained ${photos.length} unique images for "${catSlug}"`);
+    } catch (err) {
+      console.warn(`  -> Failed fetching pool for "${catSlug}": ${err.message}`);
+      categoryImagePools[catSlug] = getPlaceholderImages(query, 25);
+      categoryIndexMap[catSlug] = 0;
+    }
+  }
+
   let created = 0;
   let skipped = 0;
 
@@ -687,11 +750,24 @@ async function seed() {
       const existing = await Product.findOne({ where: { name: p.name } });
       
       let images = pickProductImages(p.category, p.name, 4);
+      // Nếu là ảnh fallback (trùng lặp), dùng ảnh từ pool độc nhất
       if (images && images.length > 1 && images[0] === images[1]) {
-        const query = p.unsplashQuery || p.name;
-        const pexelsImgs = await getPexelsImages(query, 4);
-        if (pexelsImgs && pexelsImgs.length > 0) {
-          images = pexelsImgs;
+        const pool = categoryImagePools[p.category] || [];
+        if (pool.length >= 4) {
+          const startIdx = categoryIndexMap[p.category];
+          images = [
+            pool[startIdx % pool.length],
+            pool[(startIdx + 1) % pool.length],
+            pool[(startIdx + 2) % pool.length],
+            pool[(startIdx + 3) % pool.length]
+          ];
+          categoryIndexMap[p.category] = (startIdx + 4) % pool.length;
+        } else {
+          const query = p.unsplashQuery || p.name;
+          const pexelsImgs = await getPexelsImages(query, 4);
+          if (pexelsImgs && pexelsImgs.length > 0) {
+            images = pexelsImgs;
+          }
         }
       }
 
