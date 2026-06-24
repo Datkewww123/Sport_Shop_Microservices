@@ -35,6 +35,9 @@ function OrderSummaryItem({ item }) {
 
 // ─── Saved Address Card ───────────────────────────────────────────────────────
 function SavedAddressCard({ address, isSelected, onSelect, onSetDefault, onDelete }) {
+  const addrId = address.id || address._id;
+  const addrName = address.full_name || address.fullName;
+  const addrIsDefault = address.is_default || address.isDefault;
   return (
     <div
       className={`border rounded-lg p-3 transition-all ${
@@ -48,21 +51,21 @@ function SavedAddressCard({ address, isSelected, onSelect, onSetDefault, onDelet
           className="flex-1 min-w-0 cursor-pointer"
           onClick={() => onSelect(address)}
         >
-          <p className="font-semibold text-sm truncate">{address.fullName}</p>
+          <p className="font-semibold text-sm truncate">{addrName}</p>
           <p className="text-xs text-gray-500">{address.phone}</p>
           <p className="text-xs text-gray-500 mt-1 line-clamp-2">
             {address.street}, {address.ward}, {address.district}, {address.province}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {address.isDefault ? (
+          {addrIsDefault ? (
             <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium whitespace-nowrap">
               Mặc định
             </span>
           ) : (
             <button
               type="button"
-              onClick={(e) => { e.stopPropagation(); onSetDefault(address._id); }}
+              onClick={(e) => { e.stopPropagation(); onSetDefault(addrId); }}
               className="text-[10px] text-gray-400 hover:text-red-500 border border-dashed border-gray-300 hover:border-red-400 px-2 py-0.5 rounded-full transition-colors whitespace-nowrap cursor-pointer"
               title="Đặt làm mặc định"
             >
@@ -71,7 +74,7 @@ function SavedAddressCard({ address, isSelected, onSelect, onSetDefault, onDelet
           )}
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); onDelete(address._id); }}
+            onClick={(e) => { e.stopPropagation(); onDelete(addrId); }}
             className="text-gray-300 hover:text-red-500 transition-colors cursor-pointer"
             title="Xóa địa chỉ"
           >
@@ -104,13 +107,13 @@ export default function CheckoutPage() {
 
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [addressesLoading, setAddressesLoading] = useState(false);
-  const [saveAddress, setSaveAddress] = useState(false);
+  const [saveAddress, setSaveAddress] = useState(true);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
 
   const fillFormFromAddress = (addr) => {
     setFormData(prev => ({
       ...prev,
-      fullName: addr.fullName || prev.fullName,
+      fullName: addr.full_name || addr.fullName || prev.fullName,
       phone: addr.phone || prev.phone,
       province: addr.province || prev.province,
       district: addr.district || prev.district,
@@ -128,9 +131,9 @@ export default function CheckoutPage() {
       .then(res => {
         if (!cancelled && res.success) {
           setSavedAddresses(res.data || []);
-          const defaultAddr = (res.data || []).find(a => a.isDefault);
+          const defaultAddr = (res.data || []).find(a => a.is_default || a.isDefault);
           if (defaultAddr) {
-            setSelectedAddressId(defaultAddr._id);
+            setSelectedAddressId(defaultAddr.id || defaultAddr._id);
             fillFormFromAddress(defaultAddr);
           }
         }
@@ -149,7 +152,7 @@ export default function CheckoutPage() {
   };
 
   const handleSelectAddress = (address) => {
-    setSelectedAddressId(address._id);
+    setSelectedAddressId(address.id || address._id);
     fillFormFromAddress(address);
   };
 

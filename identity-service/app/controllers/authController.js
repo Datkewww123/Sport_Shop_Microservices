@@ -118,3 +118,71 @@ exports.logout = (req, res) => {
 
   return ResponseHelper.success(res, null, 'Đăng xuất thành công');
 };
+
+// Kiểm tra email có tồn tại không (dùng cho bước 1 của quên mật khẩu)
+exports.checkEmail = async (req, res, next) => {
+  try {
+    const User = getUser();
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Email là bắt buộc' });
+    }
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản với email này' });
+    }
+    return ResponseHelper.success(res, { email }, 'Email hợp lệ');
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Quên mật khẩu: nhập email + mật khẩu mới (không cần OTP vì là MVP)
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const User = getUser();
+    const { email, newPassword } = req.body;
+    if (!email || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Email và mật khẩu mới là bắt buộc' });
+    }
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản với email này' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: 'Mật khẩu mới phải có ít nhất 6 ký tự' });
+    }
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await user.update({ password: hashed });
+    return ResponseHelper.success(res, null, 'Đặt lại mật khẩu thành công');
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Đổi mật khẩu khi đã đăng nhập: cần xác nhận mật khẩu cũ
+exports.changePassword = async (req, res, next) => {
+  try {
+    const User = getUser();
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Mật khẩu cũ và mật khẩu mới là bắt buộc' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: 'Mật khẩu mới phải có ít nhất 6 ký tự' });
+    }
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
+    }
+    const valid = await bcrypt.compare(oldPassword, user.password);
+    if (!valid) {
+      return res.status(400).json({ success: false, message: 'Mật khẩu cũ không đúng' });
+    }
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await user.update({ password: hashed });
+    return ResponseHelper.success(res, null, 'Đổi mật khẩu thành công');
+  } catch (err) {
+    next(err);
+  }
+};

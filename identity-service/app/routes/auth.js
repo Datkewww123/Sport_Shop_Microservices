@@ -231,4 +231,13 @@ router.post('/logout', authController.logout);
  */
 router.get('/profile', auth, authController.profile);
 
+// Kiểm tra email tồn tại (bước 1 quên mật khẩu)
+router.post('/check-email', authController.checkEmail);
+
+// Quên mật khẩu (không cần đăng nhập - nhập email để đặt lại mật khẩu)
+router.post('/reset-password', authController.resetPassword);
+
+// Đổi mật khẩu (cần đăng nhập - phải nhập đúng mật khẩu cũ)
+router.post('/change-password', auth, authController.changePassword);
+
 module.exports = router;
