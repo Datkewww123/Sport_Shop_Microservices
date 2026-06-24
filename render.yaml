@@ -24,6 +24,8 @@ services:
         value: https://soap-catalog-service.onrender.com
       - key: ORDER_SERVICE_URL
         value: https://soap-order-service.onrender.com
+      - key: CORS_ORIGIN
+        value: https://sport-shop-microservices.vercel.app,http://localhost:5173
 
   - type: web
     name: soap-catalog-service
@@ -46,6 +48,8 @@ services:
         value: soap_catalog_db
       - key: JWT_SECRET
         value: mot_chuoi_bi_mat_bat_ky
+      - key: CORS_ORIGIN
+        value: https://sport-shop-microservices.vercel.app,http://localhost:5173
 
   - type: web
     name: soap-order-service
@@ -77,6 +81,8 @@ services:
         value: https://soap-catalog-service.onrender.com
       - key: IDENTITY_SERVICE_URL
         value: https://soap-identity-service.onrender.com
+      - key: CORS_ORIGIN
+        value: https://sport-shop-microservices.vercel.app,http://localhost:5173
 
   - type: web
     name: soap-payment-service
