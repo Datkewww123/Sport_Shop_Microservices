@@ -160,15 +160,6 @@ export default function Header() {
                             Giỏ hàng
                           </Link>
                         </li>
-                        <li>
-                          <Link
-                            to="/thanh-toan"
-                            onClick={() => setUserDropdownOpen(false)}
-                            className="block py-3 px-4 text-gray-700 dark:text-slate-200 text-sm border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-                          >
-                            Thanh toán
-                          </Link>
-                        </li>
 
                         <li>
                           <button

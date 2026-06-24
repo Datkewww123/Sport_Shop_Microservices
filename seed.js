@@ -254,6 +254,9 @@ const CATEGORY_QUERIES = {
   'giay-chay-bo':                 'running shoes product -people',
   'giay-bong-ro':                 'basketball shoes product -people',
   'giay-tennis':                  'tennis shoes product -people',
+  'giay-da-bong-tre-em':          'kids soccer shoes -people',
+  'giay-da-bong-gia-re':          'budget soccer cleats -people',
+  'phien-ban-gioi-han':           'limited edition soccer shoes -people',
   'qua-bong-da':                  'soccer ball football product -people',
   'boc-ong-dong':                 'soccer shin guards -people',
   'gang-tay-thu-mon':             'goalkeeper gloves -people',
@@ -301,6 +304,11 @@ const CATEGORIES_DATA = [
   { name: 'Giày chạy bộ',                  slug: 'giay-chay-bo',                  type: 'sport',       imageUrl: 'https://images.pexels.com/photos/15475641/pexels-photo-15475641.jpeg?auto=compress&cs=tinysrgb&w=800', description: 'Độ êm ái cao, giảm chấn và tối ưu từng bước chạy.' },
   { name: 'Giày bóng rổ',                  slug: 'giay-bong-ro',                  type: 'sport',       imageUrl: 'https://images.pexels.com/photos/12879628/pexels-photo-12879628.jpeg?auto=compress&cs=tinysrgb&w=800', description: 'Cổ cao bảo vệ khớp cổ chân, chống trơn trượt cực tốt.' },
   { name: 'Giày tennis',                   slug: 'giay-tennis',                   type: 'sport',       imageUrl: 'https://images.pexels.com/photos/9241609/pexels-photo-9241609.jpeg?auto=compress&cs=tinysrgb&w=800', description: 'Thiết kế bền bỉ, tối ưu lực đẩy cho các chuyển động ngang.' },
+
+  // DANH MỤC ĐẶC BIỆT
+  { name: 'Giày đá bóng trẻ em',            slug: 'giay-da-bong-tre-em',            type: 'standard',    description: 'Giày bóng đá thiết kế dành riêng cho trẻ em, nhẹ và vừa chân.' },
+  { name: 'Giày đá bóng giá rẻ',            slug: 'giay-da-bong-gia-re',            type: 'standard',    description: 'Giày bóng đá phân khúc giá rẻ, chất lượng tốt cho người mới chơi.' },
+  { name: 'Phiên bản giới hạn',             slug: 'phien-ban-gioi-han',             type: 'standard',    description: 'Các phiên bản giày đặc biệt, số lượng có hạn.' },
 
   // PHỤ KIỆN DROPDOWN
   { name: 'Quả bóng đá',                   slug: 'qua-bong-da',                   type: 'standard',    description: 'Quả bóng đá thi đấu chất lượng cao, độ nảy chuẩn.' },
@@ -567,6 +575,36 @@ const categorySpecs = {
     material: 'EVA foam',
     sole: 'EVA sole',
     query: 'slides sandals'
+  },
+  'giay-da-bong-tre-em': {
+    nameTemplates: ['Junior Vapor FG', 'Kids Predator TF', 'Future Youngster', 'Mini Morelia', 'Little Puma ST'],
+    priceRange: [400000, 1200000],
+    sizes: ['30', '31', '32', '33', '34', '35', '36', '37', '38'],
+    colors: [['Xanh dương/Trắng'], ['Đỏ/Đen'], ['Vàng/Xanh']],
+    footType: 'unisex',
+    material: 'Synthetic Leather',
+    sole: 'Multi-ground',
+    query: 'kids soccer cleats'
+  },
+  'giay-da-bong-gia-re': {
+    nameTemplates: ['Strike Budget FG', 'Value Academy TF', 'Starter Pro', 'Economic Play', 'Budget King ST'],
+    priceRange: [250000, 800000],
+    sizes: ['38', '39', '40', '41', '42', '43'],
+    colors: [['Đen'], ['Trắng'], ['Xanh navy']],
+    footType: 'unisex',
+    material: 'Synthetic Leather',
+    sole: 'Rubber outsole',
+    query: 'budget soccer cleats'
+  },
+  'phien-ban-gioi-han': {
+    nameTemplates: ['Limited Edition Elite FG', 'Signature Series Pro', 'Exclusive Colorway TF', 'Special Pack FG', 'Rare Edition ST'],
+    priceRange: [3500000, 7000000],
+    sizes: ['39', '40', '41', '42', '43', '44'],
+    colors: [['Vàng/Đen limited'], ['Bạc/Đỏ exclusive'], ['Trắng/Vàng special']],
+    footType: 'be',
+    material: 'Premium Kangaroo Leather',
+    sole: 'Carbon fiber plate',
+    query: 'limited edition soccer cleats'
   }
 };
 
