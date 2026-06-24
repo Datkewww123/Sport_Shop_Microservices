@@ -68,7 +68,6 @@ function SavedAddressCard({ address, isSelected, onSelect, onSetDefault, onDelet
 function ProfileTab({ user }) {
   const [formData, setFormData] = useState({
     name: user.name || "",
-    phone: user.phone || "",
   });
 
   // Password state
@@ -207,20 +206,16 @@ function ProfileTab({ user }) {
 
   const handleSaveAddress = async (e) => {
     e.preventDefault();
-    if (!addressForm.fullName || !addressForm.province || !addressForm.district || !addressForm.street) {
+    if (!addressForm.fullName || !addressForm.phone || !addressForm.province || !addressForm.district || !addressForm.street) {
       toast.error("Vui lòng điền đầy đủ thông tin địa chỉ.");
       return;
     }
-    const payload = {
-      ...addressForm,
-      phone: addressForm.phone || user.phone || "",
-    };
     try {
       if (editingAddress) {
         const addrId = editingAddress.id || editingAddress._id;
         const res = await fetchApi(`/users/addresses/${addrId}`, {
           method: 'PUT',
-          body: JSON.stringify({ ...payload, isDefault: editingAddress.is_default || editingAddress.isDefault }),
+          body: JSON.stringify({ ...addressForm, isDefault: editingAddress.is_default || editingAddress.isDefault }),
         });
         if (res.success) {
           setSavedAddresses(res.data || []);
@@ -230,7 +225,7 @@ function ProfileTab({ user }) {
         const res = await fetchApi('/users/addresses', {
           method: 'POST',
           body: JSON.stringify({
-            ...payload,
+            ...addressForm,
             isDefault: savedAddresses.length === 0,
           }),
         });
@@ -305,19 +300,6 @@ function ProfileTab({ user }) {
               className="w-full p-3 border rounded-md bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 cursor-not-allowed"
             />
           </div>
-          <div>
-            <label htmlFor="phone" className="block text-sm font-bold mb-1 dark:text-gray-200">
-              Số điện thoại
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleInputChange}
-              className="w-full p-3 border rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-gray-300 dark:border-gray-600"
-            />
-          </div>
           <button
             type="submit"
             className="bg-primary text-white font-bold py-3 px-6 rounded-md hover:bg-primary-dark transition-colors"
@@ -384,6 +366,15 @@ function ProfileTab({ user }) {
                 onChange={handleAddressFormChange}
                 required
                 className="col-span-2 p-3 border rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-gray-300 dark:border-gray-600"
+              />
+              <input
+                type="tel"
+                placeholder="Số điện thoại *"
+                name="phone"
+                value={addressForm.phone}
+                onChange={handleAddressFormChange}
+                required
+                className="col-span-1 p-3 border rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-gray-300 dark:border-gray-600"
               />
               <input
                 type="text"
