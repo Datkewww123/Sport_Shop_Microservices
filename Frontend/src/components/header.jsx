@@ -318,7 +318,7 @@ export default function Header() {
                     </li>
                     <li>
                       <Link
-                        to="/danh-muc/giay-co-tu-nhien"
+                        to="/danh-muc/giay-bong-da-san-co-tu-nhien"
                         className="flex justify-between items-center py-2.5 px-3 font-bold text-[#f0f0f0] transition-colors hover:bg-[#555]"
                       >
                         GIÀY CỎ TỰ NHIÊN
@@ -326,7 +326,7 @@ export default function Header() {
                     </li>
                     <li>
                       <Link
-                        to="/danh-muc/giay-co-nhan-tao"
+                        to="/danh-muc/giay-bong-da-san-co-nhan-tao"
                         className="flex justify-between items-center py-2.5 px-3 font-bold text-[#f0f0f0] transition-colors hover:bg-[#555]"
                       >
                         GIÀY CỎ NHÂN TẠO
@@ -938,10 +938,10 @@ export default function Header() {
                     <Link to="/danh-muc/tat-ca" className="block py-2 pl-8 pr-5 text-sm text-gray-300 hover:bg-gray-700" onClick={() => setMobileOpen(false)}>Hàng mới về</Link>
                   </li>
                   <li>
-                    <Link to="/danh-muc/giay-co-tu-nhien" className="block py-2 pl-8 pr-5 text-sm text-gray-300 hover:bg-gray-700" onClick={() => setMobileOpen(false)}>Giày cỏ tự nhiên</Link>
+                    <Link to="/danh-muc/giay-bong-da-san-co-tu-nhien" className="block py-2 pl-8 pr-5 text-sm text-gray-300 hover:bg-gray-700" onClick={() => setMobileOpen(false)}>Giày cỏ tự nhiên</Link>
                   </li>
                   <li>
-                    <Link to="/danh-muc/giay-co-nhan-tao" className="block py-2 pl-8 pr-5 text-sm text-gray-300 hover:bg-gray-700" onClick={() => setMobileOpen(false)}>Giày cỏ nhân tạo</Link>
+                    <Link to="/danh-muc/giay-bong-da-san-co-nhan-tao" className="block py-2 pl-8 pr-5 text-sm text-gray-300 hover:bg-gray-700" onClick={() => setMobileOpen(false)}>Giày cỏ nhân tạo</Link>
                   </li>
                   <li>
                     <Link to="/danh-muc/giay-futsal" className="block py-2 pl-8 pr-5 text-sm text-gray-300 hover:bg-gray-700" onClick={() => setMobileOpen(false)}>Giày Futsal</Link>
