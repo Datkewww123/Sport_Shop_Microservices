@@ -87,7 +87,7 @@ export default function ProductListPage() {
       };
     } catch (e) {
       console.warn(`Không tìm thấy category: ${categoryId}`, e);
-      return { categoryId: null, pageTitle: categoryId.toUpperCase().replace(/-/g, " ") };
+      return { categoryId: null, pageTitle: "Không tìm thấy danh mục", categoryFound: false };
     }
   }, [categoryId]);
 

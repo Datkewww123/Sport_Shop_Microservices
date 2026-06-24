@@ -14,7 +14,7 @@ const SMALL_BANNERS = [
   {
     img: "https://theme.hstatic.net/1000061481/1001035882/14/index_banner_5.jpg?v=2391",
     title: "GIÀY ĐÁ BANH TRẺ EM",
-    linkUrl: "/danh-muc/giay-da-bong-tre-em",
+    linkUrl: "/danh-muc/giay-bong-da",
     id: "small-card-kids",
   },
   {
