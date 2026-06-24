@@ -97,3 +97,4 @@ services:
   - type: redis
     name: soap-redis
     plan: free
+    ipAllowList: []
