@@ -157,7 +157,7 @@ function EmptyCart() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           {loading
             ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
             : products.map((product) => (
@@ -363,11 +363,11 @@ export default function CartPage() {
           </span>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6 items-start">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start">
           {/* ── Left column: product list ── */}
-          <div className="w-full lg:w-2/3 space-y-4">
+          <div className="w-full md:w-2/3 space-y-4">
             {/* Desktop header row */}
-            <div className="hidden lg:grid grid-cols-12 gap-4 px-5 py-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+            <div className="hidden sm:grid grid-cols-12 gap-4 px-5 py-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 text-xs font-semibold text-gray-400 uppercase tracking-wide">
               <div className="col-span-1 flex items-center justify-center">
                 <input
                   type="checkbox"
@@ -445,7 +445,7 @@ export default function CartPage() {
           </div>
 
           {/* ── Right column: summary ── */}
-          <div className="w-full lg:w-1/3">
+          <div className="w-full md:w-1/3">
             <CartSummary
               totalPrice={totalPrice}
               selectedTotalPrice={selectedTotalPrice}

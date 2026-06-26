@@ -306,7 +306,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="bg-gray-100 py-10">
-      <div className="container w-[90%] max-w-[1000px] mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
+      <div className="container w-[90%] max-w-[1000px] mx-auto grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-8">
         {/* === CỘT TRÁI (FORM) === */}
         <form
           onSubmit={handlePlaceOrder}
