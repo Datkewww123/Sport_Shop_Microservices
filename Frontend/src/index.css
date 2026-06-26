@@ -10,6 +10,8 @@
 @layer base {
   body {
     @apply font-['Inter',_sans-serif] bg-light-gray text-[#333] dark:bg-gray-900 dark:text-gray-100;
+    overflow-x: hidden;
+    overflow-wrap: break-word;
   }
 
   * {
@@ -146,9 +148,26 @@
   @apply text-gray-400;
 }
 
-/* Smooth transitions for dark mode (if needed) */
-* {
+/* Smooth transitions for dark mode - chỉ áp dụng cho các element cần thiết */
+html {
   @apply transition-colors duration-200;
+}
+
+/* ===== RESPONSIVE UTILITIES ===== */
+@media (max-width: 360px) {
+  .container-custom {
+    @apply w-[95%];
+  }
+}
+
+/* Prevent horizontal overflow on all containers */
+.container-custom {
+  overflow-x: hidden;
+}
+
+/* Ensure tables and grids scroll horizontally on very small screens */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ===== DARK MODE STYLES ===== */
